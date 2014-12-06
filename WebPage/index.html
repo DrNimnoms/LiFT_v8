@@ -1,0 +1,3404 @@
+<!DOCTYPE html>
+<html>
+  <head>
+<title>GA GUI</title>
+<script src="Wijmo.2.3.5/explore/js/jquery-1.7.1.min.js" type="text/javascript"></script>
+<script src="Wijmo.2.3.5/explore/js/jquery-ui-1.8.18.custom.min.js" type="text/javascript"></script>
+ 
+<!--Theme-->
+<link href="Wijmo.2.3.5/Wijmo-Complete/development-bundle/themes/rocket/jquery-wijmo.css" rel="stylesheet" type="text/css" title="rocket-jqueryui" />
+ 
+<!--Wijmo Widgets CSS-->
+<link href="Wijmo.2.3.5/Wijmo-Complete/css/jquery.wijmo-complete.all.2.3.5.min.css" rel="stylesheet" type="text/css" />
+ 
+<!--Wijmo Widgets JavaScript-->
+<script src="Wijmo.2.3.5/Wijmo-Open/js/jquery.wijmo-open.all.2.3.5.min.js" type="text/javascript"></script>
+<script src="Wijmo.2.3.5/Wijmo-Complete/js/jquery.wijmo-complete.all.2.3.5.min.js" type="text/javascript"></script>
+<link href="css/bootstrap.css" type="text/css" rel="stylesheet">
+<script type="application/x-javascript" src="js/bootstrap.min.js"></script>
+<style>
+body {
+	background-color: white;
+}
+	
+#page_container {
+	/*width:740px;
+	margin: 20px auto;*/
+	width:100%;
+	padding-top: 5px;
+}
+
+.container-table {
+	position: relative;	
+	/*width:730px;
+	margin: 0 auto;*/
+	width:100%;
+}
+
+table {
+	border-collapse: collapse;
+}
+
+em {
+  font: 20px;
+  color:#ff0000;
+}
+
+.gauge_table {
+	position: relative;
+	width: 100%;
+	margin: 0 auto;
+}
+
+.gauge_table button {
+	width: 48%;
+	text-align: center;
+	font-weight: bold;
+}
+
+/* state of charge gauge */
+#SOC {
+	/*width:630px;*/
+	/*width:92%;*/
+	width:94%;
+	height:50px;
+}
+#SOC2 {
+	/*width:630px;*/
+	/*width:92%;*/
+	width:94%;
+	height:50px;
+}
+
+.info_table {
+	border: 0;
+	font-size: 12px;
+	margin: 0 auto;
+	/*width: 100%;*/
+	width: 160px;
+	height: 100%;
+}
+
+.info_table tr td{
+	padding-bottom: 3px;
+	padding-left: 3px;
+	padding-right: 3px;
+}
+
+.info_table tr td img{
+	padding-bottom: 3px;
+}
+
+.charge_gauge_table {
+	position: relative;
+	width: 100%;
+	margin: 0 auto;
+}
+
+.charge_gauge_table tr td {
+	padding-left: 2px;
+}
+
+.charge_gauge_table tr td div {
+	padding-left: 0px;
+}
+
+.dataTable {
+	height: 326px;
+	width: 100%;
+}
+
+.dataTable tr {
+	height: 25px;
+}
+
+.dataTable tr td {
+	width: 5%;
+	padding-left:3px;
+	padding-right:3px;
+	font-size: 13px;
+	text-align: right;
+}
+
+.dataSummary {
+	padding-left:12px;
+	padding-top:11px;
+}
+
+.dataSummary table {
+	font-size: 14px;
+	width: 100%;
+}
+
+.tfields td {
+	font-weight: bold;
+}
+
+.datafield {
+	font-weight: bold;
+}
+
+.gauge_val1 {
+	text-align: center;
+	padding-bottom: 3px;
+	font-size: 16px;
+	font-weight: bold;
+}
+
+.gauge_val2 {
+	text-align: center;
+	padding-bottom: 25px;
+	font-size: 14px;
+}
+
+
+.section_header {
+	 padding-top:10px;
+	 padding-bottom:10px;
+	 color:#333;
+	 font-size:16px;
+	 font-weight:bold;
+}
+
+.main_section {
+	width:100%;
+	/*height:360px;*/
+}
+
+.fault_tbl {
+	width: 100%;
+	border: 1px solid #ddd;
+	border-collapse: collapse;
+}
+.fault_tbl tr td {
+	padding: 4px;
+	border-left: 1px solid #ddd;
+}
+.fault_tbl tr th {
+	padding: 4px;
+	border-left: 1px solid #ddd;
+	border-bottom: 1px solid #ddd;
+}
+
+.no-bold {
+	font-weight: normal;
+}
+
+.red {
+	background-color: red;
+}
+
+.lred {
+	background-color: #ff6666;
+}
+
+.error_text {
+	background-color: #000;
+	color: red;
+}
+
+/*
+.ui-dialog-buttonset button {
+	font-weight: bold;
+	width: 30px;
+	height: 20px;
+}
+*/
+</style>
+<script type="text/javascript">
+
+$(document).ready(function () {
+	var debug=1;
+	var loopTime = 1000;  //time between data pulls (in milliseconds)
+	var bmu=[];
+	var defaultbmu={"Flag":"0","priority":"3.0","Mode":"0","SOC":"38.8","Total_V":"155.33","Current":"0.0","minV":"3.6962","maxV":"3.713","maxT":"21.14","pressure":"1.03","dpressure":"-0.27","B1V1":"3.699","B1V2":"3.697","B1V3":"3.696","B2V1":"3.701","B2V2":"3.697","B2V3":"3.700","B3V1":"3.703","B3V2":"3.704","B3V3":"3.703","B4V1":"3.702","B4V2":"3.705","B4V3":"3.704","B5V1":"3.707","B5V2":"3.704","B5V3":"3.707","B6V1":"3.712","B6V2":"3.713","B6V3":"3.713","B7V1":"3.705","B7V2":"3.705","B7V3":"3.705","B8V1":"3.696","B8V2":"3.700","B8V3":"3.699","B9V1":"3.704","B9V2":"3.702","B9V3":"3.704","B10V1":"3.705","B10V2":"3.704","B10V3":"3.702","B11V1":"3.702","B11V2":"3.701","B11V3":"3.700","B12V1":"3.699","B12V2":"3.702","B12V3":"3.700","B13V1":"3.705","B13V2":"3.707","B13V3":"3.703","B14V1":"3.701","B14V2":"3.705","B14V3":"3.702","B1Vsum":"11.10","B2Vsum":"11.11","B3Vsum":"11.13","B4Vsum":"11.15","B5Vsum":"11.11","B6Vsum":"11.15","B7Vsum":"11.15","B8Vsum":"11.11","B9Vsum":"11.14","B10Vsum":"11.13","B11Vsum":"11.10","B12Vsum":"11.09","B13Vsum":"11.11","B14Vsum":"11.13","B1Vref":"3.0016","B2Vref":"2.9984","B3Vref":"3.0015","B4Vref":"3.0026","B5Vref":"3.0005","B6Vref":"2.9994","B7Vref":"3.0012","B8Vref":"2.9997","B9Vref":"2.9991","B10Vref":"2.9997","B11Vref":"3.0014","B12Vref":"2.9994","B13Vref":"3.0004","B14Vref":"3.0008","B1T1":"20.48","B1T2":"20.52","B1T3":"20.52","B1T4":"20.97","B2T1":"20.72","B2T2":"20.93","B2T3":"20.91","B2T4":"21.65","B3T1":"20.80","B3T2":"20.90","B3T3":"21.05","B3T4":"21.89","B4T1":"20.66","B4T2":"20.79","B4T3":"20.90","B4T4":"22.09","B5T1":"21.01","B5T2":"21.10","B5T3":"21.30","B5T4":"22.43","B6T1":"20.87","B6T2":"20.99","B6T3":"20.82","B6T4":"21.42","B7T1":"21.19","B7T2":"20.83","B7T3":"20.89","B7T4":"22.13","B8T1":"20.18","B8T2":"20.70","B8T3":"20.59","B8T4":"21.20","B9T1":"20.63","B9T2":"20.74","B9T3":"20.96","B9T4":"21.55","B10T1":"20.83","B10T2":"20.98","B10T3":"20.94","B10T4":"21.98","B11T1":"20.80","B11T2":"20.70","B11T3":"20.82","B11T4":"21.77","B12T1":"20.46","B12T2":"20.79","B12T3":"20.73","B12T4":"21.12","B13T1":"20.40","B13T2":"20.65","B13T3":"20.56","B13T4":"21.64","B14T1":"21.05","B14T2":"21.02","B14T3":"21.19","B14T4":"22.43","B1TI":"14.89","B2TI":"16.19","B3TI":"14.79","B4TI":"18.51","B5TI":"13.84","B6TI":"14.27","B7TI":"19.27","B8TI":"15.29","B9TI":"15.13","B10TI":"15.91","B11TI":"12.13","B12TI":"18.21","B13TI":"18.32","B14TI":"15.44","maxV":"3.713"};
+	bmu[0]=defaultbmu;
+	bmu[1]=defaultbmu;
+	bmu[2]=defaultbmu;
+	bmu[3]=defaultbmu;
+	
+	var portBtnState={"drivePort":0,"stopPort":0,"chargePort":0,"balancePort":0};
+	var starBtnState={"driveStar":0,"stopStar":0,"chargeStar":0,"balanceStar":0};
+	var bmuLastFlag = new Array("","","",""); //last flag
+	var bmuClear = new Array(0,0,0,0);
+	var bmuIgnore = new Array(0,0,0,0);
+	var bmuOverride = new Array(0,0,0,0);
+	var bmuReset =  new Array(0,0,0,0);
+	var bmuBalance = new Array(0,0,0,0);
+	var bmuBalanceRecLight = new Array(0,0,0,0);
+	var bmuComm = new Array(1,1,1,1);
+	var hsNames= new Array("PORT AFT","PORT FWD","STBD AFT","STBD FWD");
+	var chargeCount=new Array(0,0);
+	var chargeBtn=new Array(0,0);
+	var timerChargeCycle="";
+	var bmuActiveFlagList = {
+						"0": [],
+						"1": [],
+						"2": [],
+						"3": []
+					};
+	var bmuActivePriorityList = {
+						"0": [],
+						"1": [],
+						"2": [],
+						"3": []
+					};
+	var bmuOverrideFlagList = {
+						"0": [],
+						"1": [],
+						"2": [],
+						"3": []
+					};
+	//track flagID overrides per bmu
+
+	var bmuCount60 = new Array(0,0,0,0);
+	var timerID = new Array("","","","");
+	var lastcmd = new Array("","","","");
+	var timeNow = new Date().getTime(); //milliseconds
+	var bmuDataTime = new Array(timeNow,timeNow,timeNow,timeNow);
+	var bmuPrevDataTime = new Array(timeNow,timeNow,timeNow,timeNow);
+	var bmuResetTime = new Array(timeNow,timeNow,timeNow,timeNow);
+	var bmuIgnoreTime = new Array(timeNow,timeNow,timeNow,timeNow);
+    var thisMaxTemp = 0.0;
+    var thisMinTemp = 100.0;
+	var comm = startComm();
+	var balanceDelay="";
+	var alarm = new Audio('alarm.mp3');
+	var bmuAlarm = new Array(alarm,alarm,alarm,alarm);
+
+	//flags with actions
+	var flagObj =	{
+						"0":
+							{
+								"desc":"(Flag ID 1): A water leak has occurred.",
+								"drive":2,
+								"stop":3,
+								"balance":1,
+								"charge":1
+							},
+						"1":
+							{
+								"desc":"(Flag ID 2): A temperature sensor is overheating.",
+								"drive":4,
+								"stop":4,
+								"balance":2,
+								"charge":2
+							},
+						"2":
+							{
+								"desc":"(Flag ID 3): A temperature sensor has overheated.",
+								"drive":2,
+								"stop":3,
+								"balance":1,
+								"charge":1
+							},
+						"3":
+							{
+								"desc":"(Flag ID 4): A temperature sensor has failed.",
+								"drive":4,
+								"stop":4,
+								"balance":2,
+								"charge":2
+							},
+						"4":
+							{
+								"desc":"(Flag ID 5): Rapid pressure change detected, possbile cell failure.",
+								"drive":2,
+								"stop":3,
+								"balance":1,
+								"charge":1
+							},
+						"5":
+							{
+								"desc":"(Flag ID 6): Pressure sensor reading is out of range.",
+								"drive":2,
+								"stop":4,
+								"balance":2,
+								"charge":2
+							},
+						"6":
+							{
+								"desc":"(Flag ID 7): A virtual cell voltage is too high.",
+								"drive":2,
+								"stop":3,
+								"balance":1,
+								"charge":1
+							},
+						"7":
+							{
+								"desc":"(Flag ID 8): Minimum cell voltage is too low for BALANCE MODE.",
+								"drive":0,
+								"stop":0,
+								"balance":1,
+								"charge":0
+							},
+						"8":
+							{
+								"desc":"(Flag ID 9): A virtual cell voltage is becoming too low.",
+								"drive":4,
+								"stop":4,
+								"balance":0,
+								"charge":0
+							},
+						"9":
+							{
+								"desc":"(Flag ID 10):A virtual cell voltage is too low.",
+								"drive":2,
+								"stop":3,
+								"balance":0,
+								"charge":0
+							},
+						"10":
+							{
+								"desc":"(Flag ID 11): A virtual cell is dead. ",
+								"drive":0,
+								"stop":3,
+								"balance":0,
+								"charge":1
+							},
+						"11":
+							{
+								"desc":"(Flag ID 12): A voltage sensor has failed.",
+								"drive":2,
+								"stop":4,
+								"balance":1,
+								"charge":1
+							},
+						"12":
+							{
+								"desc":"(Flag ID 13): There is a voltage mismatch in a module or the entire half-string.",
+								"drive":4,
+								"stop":4,
+								"balance":2,
+								"charge":1
+							},
+						"13":
+							{
+								"desc":"(Flag ID 14): BME flag alarm.",
+								"drive":2,
+								"stop":3,
+								"balance":1,
+								"charge":1
+							},
+						"14":
+							{
+								"desc":"(Flag ID 15): A communication failure occurred between the BMU and BME.",
+								"drive":2,
+								"stop":3,
+								"balance":1,
+								"charge":1
+							},
+						"15":
+							{
+								"desc":"(Flag ID 16): A communication failure occurred between the BMC and BMU.",
+								"drive":3,
+								"stop":3,
+								"balance":1,
+								"charge":1
+							},
+						"16":
+							{
+								"desc":"(Flag ID 17): Current is out of range for ON MODE.",
+								"drive":2,
+								"stop":0,
+								"balance":0,
+								"charge":0
+							},
+						"17":
+							{
+								"desc":"(Flag ID 18): Current is out of range for CHARGE MODE.",
+								"drive":0,
+								"stop":0,
+								"balance":0,
+								"charge":1
+							},
+						"18":
+							{
+								"desc":"(Flag ID 19): Current is out of range for OFF MODE.",
+								"drive":0,
+								"stop":3,
+								"balance":1,
+								"charge":0
+							},
+						"19":
+							{
+								"desc":"(Flag ID 20):CHARGE/BALANCE MODE taking too long, a timeout has occurred.",
+								"drive":0,
+								"stop":0,
+								"balance":1,
+								"charge":1
+							},
+						"20":
+							{
+								"desc":"(Flag ID 21): Charging has finshed.",
+								"drive":0,
+								"stop":0,
+								"balance":0,
+								"charge":6
+							},
+						"21":
+							{
+								"desc":"(Flag ID 22): Balancing has finished.",
+								"drive":0,
+								"stop":0,
+								"balance":6,
+								"charge":0
+							},
+						"22":
+							{
+								"desc":"(Flag ID 23): Balancing is recommended. Click the Balance button to enter BALANCE MODE.",
+								"drive":5,
+								"stop":5,
+								"balance":0,
+								"charge":5
+							},
+					};
+	//if(debug) console.log(flagObj["1"]["desc"]);
+    
+    $("#tabs").wijtabs();
+
+	//INITIALIZE GAUGES:
+	//port Voltage gauge
+	$("#PVGauge").wijlineargauge({
+		width: 440,
+		height: 60,
+		value: 280,
+		marginBottom: 0,
+		marginLeft: 8,
+		marginTop: 0,
+		marginRight: 4,
+		xAxisLocation: 0.02,
+		xAxisLength: 0.98,				
+		max: 365,
+		min: 225,
+		labels: {
+			style: {
+				fill: "#1E395B",
+				"font-size": 12,
+				"font-weight": "800"
+			}
+		},
+		tickMajor: {
+			position: "inside",
+			offset: -5,
+			interval: 25,
+			factor: 3,
+			style: {
+				fill: "#333",
+				stroke: "none",
+				opacity: 0.8
+			}
+		},
+		tickMinor: {
+			position: "inside",
+			offset: -1,
+			visible: true,
+			interval: 5,
+			style: {
+				fill: "#333",
+				stroke: "none",
+				opacity: 0.8
+			}
+		},
+		/*pointer: {
+			shape: "rect",
+			length: 0.6,
+			style: {
+				fill: "#1E395B",
+				stroke: "#7BA0CC",
+				"stroke-width": 1,
+				opacity: 1
+			}
+		},*/
+		face: {
+			style: {
+				fill: "270-#FFFFFF-#D9E3F0",
+				stroke: "#7BA0CC",
+				"stroke-width": 1
+			}
+		},
+		ranges: [
+			{
+				startValue: 225,
+				endValue: 255,
+				startDistance: 0.80,
+				endDistance: 0.80, 
+				startWidth: 0.4,
+				endWidth: 0.4,
+				style: {
+					fill: "#dd0000",
+					opacity: "0.6",
+					stroke: "#dd0000"
+				}
+			},
+			{
+				startValue: 255,
+				endValue: 270,
+				startDistance: 0.80,
+				endDistance: 0.80, 
+				startWidth: 0.4,
+				endWidth: 0.4,
+				style: {
+					fill: "#FF7F00",
+					opacity: "0.6",
+					stroke: "#FF7F00"
+				}
+			},
+			{
+				startValue: 270,
+				endValue: 357.5,
+				startDistance: 0.80,
+				endDistance: 0.80, 
+				startWidth: 0.4,
+				endWidth: 0.4,
+				style: {
+					fill: "#33cc00",
+					opacity: "0.6",
+					stroke: "#33cc00"
+				}
+			},
+			{
+				startValue: 357.5,
+				endValue: 360,
+				startDistance: 0.80,
+				endDistance: 0.80, 
+				startWidth: 0.4,
+				endWidth: 0.4,
+				style: {
+					fill: "#dd0000",
+					opacity: "0.6",
+					stroke: "#dd0000"
+				}
+			}						
+		]
+	}); 
+
+	//Starboard voltage gauge
+	$("#SVGauge").wijlineargauge({
+		width: 440,
+		height: 60,
+		value: 280,
+		marginBottom: 0,
+		marginLeft: 8,
+		marginTop: 0,
+		marginRight: 4,
+		xAxisLocation: 0.02,
+		xAxisLength: 0.98,				
+		max: 365,
+		min: 225,
+		labels: {
+			style: {
+				fill: "#1E395B",
+				"font-size": 12,
+				"font-weight": "800"
+			}
+		},
+		tickMajor: {
+			position: "inside",
+			offset: -5,
+			interval: 25,
+			factor: 3,
+			style: {
+				fill: "#333",
+				stroke: "none",
+				opacity: 0.8
+			}
+		},
+		tickMinor: {
+			position: "inside",
+			offset: -1,
+			visible: true,
+			interval: 5,
+			style: {
+				fill: "#333",
+				stroke: "none",
+				opacity: 0.8
+			}
+		},
+		/*pointer: {
+			shape: "rect",
+			length: 0.6,
+			style: {
+				fill: "#1E395B",
+				stroke: "#7BA0CC",
+				"stroke-width": 1,
+				opacity: 1
+			}
+		},*/
+		face: {
+			style: {
+				fill: "270-#FFFFFF-#D9E3F0",
+				stroke: "#7BA0CC",
+				"stroke-width": 1
+			}
+		},
+		ranges: [
+			{
+				startValue: 225,
+				endValue: 255,
+				startDistance: 0.80,
+				endDistance: 0.80, 
+				startWidth: 0.4,
+				endWidth: 0.4,
+				style: {
+					fill: "#dd0000",
+					opacity: "0.6",
+					stroke: "#dd0000"
+				}
+			},
+			{
+				startValue: 255,
+				endValue: 270,
+				startDistance: 0.80,
+				endDistance: 0.80, 
+				startWidth: 0.4,
+				endWidth: 0.4,
+				style: {
+					fill: "#FF7F00",
+					opacity: "0.6",
+					stroke: "#FF7F00"
+				}
+			},
+			{
+				startValue: 270,
+				endValue: 357.5,
+				startDistance: 0.80,
+				endDistance: 0.80, 
+				startWidth: 0.4,
+				endWidth: 0.4,
+				style: {
+					fill: "#33cc00",
+					opacity: "0.6",
+					stroke: "#33cc00"
+				}
+			},
+			{
+				startValue: 357.5,
+				endValue: 360,
+				startDistance: 0.80,
+				endDistance: 0.80, 
+				startWidth: 0.4,
+				endWidth: 0.4,
+				style: {
+					fill: "#dd0000",
+					opacity: "0.6",
+					stroke: "#dd0000"
+				}
+			}						
+		]
+	}); 
+
+	//port power gauge
+	$("#PPGauge").wijlineargauge({
+		width: 440,
+		height: 60,
+		value: 0,
+		marginBottom: 0,
+		marginLeft: 8,
+		marginTop: 0,
+		marginRight: 4,
+		xAxisLocation: 0.03,
+		xAxisLength: 0.92,				
+		max: 55,
+		min: 0,
+		labels: {
+			style: {
+				fill: "#1E395B",
+				"font-size": 12,
+				"font-weight": "800"
+			}
+		},
+		tickMajor: {
+			position: "inside",
+			offset: -5,
+			interval: 10,
+			factor: 3,
+			style: {
+				fill: "#333",
+				stroke: "none",
+				opacity: 0.8
+			}
+		},
+		tickMinor: {
+			position: "inside",
+			offset: -1,
+			visible: true,
+			interval: 5,
+			style: {
+				fill: "#333",
+				stroke: "none",
+				opacity: 0.8
+			}
+		},
+		/*pointer: {
+			shape: "rect",
+			length: 0.6,
+			style: {
+				fill: "#1E395B",
+				stroke: "#7BA0CC",
+				"stroke-width": 1,
+				opacity: 1
+			}
+		},*/
+		face: {
+			style: {
+				fill: "270-#FFFFFF-#D9E3F0",
+				stroke: "#7BA0CC",
+				"stroke-width": 1
+			}
+		},
+		ranges: [
+			{
+				startValue: 0,
+				endValue: 55,
+				startDistance: 0.80,
+				endDistance: 0.80, 
+				startWidth: 0.4,
+				endWidth: 0.4,
+				style: {
+					fill: "#33cc00",
+					opacity: "0.6",
+					stroke: "#33cc00"
+				}
+			}	
+		]
+	}); 
+
+	//starboard power gauge
+	$("#SPGauge").wijlineargauge({
+		width: 440,
+		height: 60,
+		value: 0,
+		marginBottom: 0,
+		marginLeft: 8,
+		marginTop: 0,
+		marginRight: 4,
+		xAxisLocation: 0.03,
+		xAxisLength: 0.92,				
+		max: 55,
+		min: 0,
+		labels: {
+			style: {
+				fill: "#1E395B",
+				"font-size": 12,
+				"font-weight": "800"
+			}
+		},
+		tickMajor: {
+			position: "inside",
+			offset: -5,
+			interval: 10,
+			factor: 3,
+			style: {
+				fill: "#333",
+				stroke: "none",
+				opacity: 0.8
+			}
+		},
+		tickMinor: {
+			position: "inside",
+			offset: -1,
+			visible: true,
+			interval: 5,
+			style: {
+				fill: "#333",
+				stroke: "none",
+				opacity: 0.8
+			}
+		},
+		/*pointer: {
+			shape: "rect",
+			length: 0.6,
+			style: {
+				fill: "#1E395B",
+				stroke: "#7BA0CC",
+				"stroke-width": 1,
+				opacity: 1
+			}
+		},*/
+		face: {
+			style: {
+				fill: "270-#FFFFFF-#D9E3F0",
+				stroke: "#7BA0CC",
+				"stroke-width": 1
+			}
+		},
+		ranges: [
+			{
+				startValue: 0,
+				endValue: 55,
+				startDistance: 0.80, 
+				endDistance: 0.80, 
+				startWidth: 0.4,
+				endWidth: 0.4,
+				style: {
+					fill: "#33cc00",
+					opacity: "0.6",
+					stroke: "#33cc00"
+				}
+			}	
+		]
+	}); 
+
+    $("#SOC").wijprogressbar({ value: 0, animationOptions: {
+            duration: 100
+        },
+        indicatorImage: "./soc-normal.png"
+    });
+
+    $("#SOC2").wijprogressbar({ value: 0, animationOptions: {
+            duration: 100
+        },
+        indicatorImage: "./soc-normal.png"
+    });  
+	
+	//pop=up when charge button is pressed
+    $("#charge-select-port").wijdialog({
+        autoOpen: false,
+        resizable: false,
+        height: 140,
+        width: 400,
+        modal: true,
+        buttons: {
+            "Storage Charge": function () {
+                //execCharge("storage","port");
+                setBtn("chargePort");
+                bmuLastFlag[0]="";
+				bmuLastFlag[1]="";
+                chargeBtn[0]=1;
+                chargeCycle("storage","port");
+				$(this).wijdialog("close");
+				
+            },
+            "Full Charge": function () {
+        		//execCharge("full","port");
+        		setBtn("chargePort");
+        		bmuLastFlag[0]="";
+				bmuLastFlag[1]="";
+        		chargeBtn[0]=1;
+        		chargeCycle("full","port");
+				$(this).wijdialog("close");
+            }
+        }
+    });
+    $("#charge-select-star").wijdialog({
+        autoOpen: false,
+        resizable: false,
+        height: 140,
+        width: 400,
+        modal: true,
+        buttons: {
+            "Storage Charge": function () {
+                //execCharge("storage","star");
+                setBtn("chargeStar");
+                bmuLastFlag[2]="";
+				bmuLastFlag[3]="";
+				chargeBtn[1]=1;
+                chargeCycle("storage","star");
+				$(this).wijdialog("close");
+            },
+            "Full Charge": function () {
+        		//execCharge("full","star");
+        		setBtn("chargeStar");
+        		bmuLastFlag[2]="";
+				bmuLastFlag[3]="";
+        		chargeBtn[1]=1;
+        		chargeCycle("full","star");
+				$(this).wijdialog("close");
+            }
+        }
+    });
+    
+    // drive, charge, balance, stop buttons onClick
+
+	//port buttons on click
+	$( "#stopPort" ).click(function() {
+		execClearStop(0);
+		execClearStop(1);
+		//setBtn($(this).attr("id"));
+		setBtn("stopPort");
+		playSound("powerdown");
+    });
+ 	$( "#drivePort" ).click(function() {
+		execDrive(0);
+		execDrive(1);
+		setBtn("drivePort");
+		playSound("powerup");
+    });
+ 	$( "#balancePort" ).click(function() {
+		execBalance(0);
+		execBalance(1);
+		setBtn("balancePort");
+		playSound("balance");
+    });
+  	$( "#chargePort" ).click(function() {
+		chargeCount[0]=0;
+		$("#charge-select-port").wijdialog('open');
+		playSound("charge");
+    });
+       
+    //starboard buttons on click
+ 	$( "#driveStar" ).click(function() {
+		execDrive(2);	
+		execDrive(3);
+		setBtn("driveStar");
+		playSound("powerup");
+    });     
+	$( "#stopStar" ).click(function() {
+		execClearStop(2);
+		execClearStop(3);
+		setBtn("stopStar");
+		playSound("powerdown");
+    });
+ 	$( "#balanceStar" ).click(function() {
+		execBalance(2);
+		execBalance(3);
+		setBtn("balanceStar");
+		playSound("balance");
+    });
+  	$( "#chargeStar" ).click(function() {
+		chargeCount[1]=0;
+		$("#charge-select-star").wijdialog('open');
+		playSound("charge");
+    }); 
+
+	//ignore and reset buttons for each tab
+	$("button[id^='ignore']").click(function() {
+		var btnid=$(this).attr("id");
+		var bmunum = parseInt(btnid.slice(-1));
+		var bmuIndex = bmunum -1;
+		var bmuId = bmuIndex + 1;
+		$("#ignore"+btnid.slice(-1)).addClass("btn-warning");
+		bmuIgnoreTime[bmuIndex] = getLastDataTime(bmuIndex);
+		writeLog("Ignoring bad temperature sensors on "+ hsNames[bmuIndex]);
+		setCommand("ignore" + getLastActionCmd(bmuId),bmuIndex);
+		bmuPrevDataTime[bmuIndex] = getLastDataTime(bmuIndex);
+		bmuIgnore[bmuIndex] = 1;
+	});
+ 
+ 	$("button[id^='reset']").click(function() {
+		var btnid=$(this).attr("id");
+		$("#reset"+btnid.slice(-1)).addClass("btn-warning");
+		var bmuIndex = parseInt(btnid.slice(-1))-1;
+		reset(bmuIndex);
+	});
+	//end buttons
+	
+	
+	function reset(bmuIndex) {
+		var bmuId = bmuIndex + 1;
+		bmuReset[bmuIndex] = 1;
+		bmuResetTime[bmuIndex] = getLastDataTime(bmuIndex);
+		writeLog("Reset " + hsNames[bmuIndex]);
+		setCommand( "clear" + getLastActionCmd(bmuId),bmuIndex);
+		bmuPrevDataTime[bmuIndex] = getLastDataTime(bmuIndex);
+	}
+	
+	
+	//arguments: bmuIndex is in set {0,1,2,3} ,{0,1} port and {2,3} stbd
+	//  purpose: Switch from "clearstop" to "stop" command 
+	// 			must recieve confirmation of clear by getting 
+	// 			a block of new data with no flags
+	function checkClearStop(bmuIndex){
+		if(bmuClear[bmuIndex] == 1){
+				//writeLog("checkClearStop::");
+				if(noActivePriorities(bmuIndex,new Array(1,2,3,4)) && newBMUDataAcquired(bmuIndex)){
+					execStop(bmuIndex);
+					bmuClear[bmuIndex] = 0;
+					bmuOverride[bmuIndex] = 0;
+					if (bmuIndex == 1){ // print one time for port
+						writeLog("PORT Reset complete. Now in OFF MODE.");
+						setBtn("stopPort");
+					}
+					else if (bmuIndex == 3){ //print one time for stbd
+						writeLog("STBD Reset complete. Now in OFF MODE.");
+						setBtn("stopStar");
+					}
+				}
+			}
+	}
+ 	
+	function checkReset(bmuIndex) {
+		var bmuId = bmuIndex+1;		
+		if(bmuReset[bmuIndex]) {
+			//writeLog("checkReset::");
+			if (noActivePriorities(bmuIndex,new Array(1,2,3,4)) && newBMUDataAcquired(bmuIndex)) {
+				$("#reset"+bmuId).removeClass("btn-warning");	//turns reset light off	
+				writeLog("Reset "+ hsNames[bmuIndex]+" complete.");
+				setCommand(getLastActionCmd(bmuId),bmuIndex);
+				bmuReset[bmuIndex] = 0;
+				bmuOverride[bmuIndex] = 0;
+			}		
+		}
+	}
+
+	
+	function checkIgnore(bmuIndex) {
+		bmuId = bmuIndex+1;
+		if(bmuIgnore[bmuIndex]) {
+			//writeLog("noTempFlags::"+noTempFlagsAreActive(bmuIndex));
+			if (noTempFlagsAreActive(bmuIndex) && newBMUDataAcquired(bmuIndex)) {
+				writeLog("success checkignore");
+				$("#ignore"+bmuId).removeClass("btn-warning");
+				writeLog("Ignore "+ hsNames[bmuIndex] +" complete.");
+				setCommand(getLastActionCmd(bmuId),bmuIndex);
+				bmuIgnore[bmuIndex] = 0;
+			}
+		}
+		else {
+			if($("#ignore"+bmuId).hasClass("btn-warning"))
+				$("#ignore"+bmuId).removeClass("btn-warning");
+		}
+	}
+
+	//set button appearance states (grey or colored)
+	function setBtn(btnID) {
+		//set all buttons to grey
+		
+		if(btnID.indexOf("Port") > -1) {
+			portBtnState={"drivePort":0,"stopPort":0,"chargePort":0,"balancePort":0};
+			portBtnState[btnID] = 1;
+		}
+		else if(btnID.indexOf("Star") > -1) {
+			starBtnState={"driveStar":0,"stopStar":0,"chargeStar":0,"balanceStar":0};
+			starBtnState[btnID] = 1;
+		}
+		//process
+		setBtnState();
+	}
+	
+	//process button states
+	function setBtnState() {
+		for (key in portBtnState) {
+			if (portBtnState.hasOwnProperty(key)) {
+				if(portBtnState[key] == 1 && $("#"+key).hasClass("disabled"))				
+					$("#"+key).toggleClass("disabled");
+				else if(portBtnState[key]==0 && !($("#"+key).hasClass("disabled")))
+					$("#"+key).toggleClass("disabled")
+			}
+		}
+		for (key in starBtnState) {
+			if (starBtnState.hasOwnProperty(key)) {
+				if(starBtnState[key] == 1 && $("#"+key).hasClass("disabled"))				
+					$("#"+key).toggleClass("disabled");
+				else if(starBtnState[key] == 0 && !($("#"+key).hasClass("disabled")))
+					$("#"+key).toggleClass("disabled")
+			}			
+		}
+	}
+
+	// arguments: command ???? , bmuIndex in {0,1,2,3}
+	//   purpose:
+    function setCommand( command, bmuIndex )
+    {
+		bmuId= bmuIndex+1;
+		//alert("setCommand("+command+","+bmu+")");
+		var _url="db.php?action="+command+"&b="+bmuId;
+		$.ajax({ url: _url,
+			type: 'GET',
+			async: false,
+			success: function() {
+				if(debug) console.log("set command in db for bmu#"+bmuId +"; command: " + command);
+				/*if(bmu < 3)
+					lastcmd["Port"]=command;
+				else
+					lastcmd["Star"]=command;*/
+				lastcmd[bmuIndex] = command;
+				if(debug) console.log(lastcmd);	
+			}
+		});
+    }
+	// arguments: bmuIndex in set {0,1,2,3}
+	//   purpose: set command to "stop" and clear any count down timers
+	function execStop(bmuIndex) { 
+		setBgWhite();
+		bmuLastFlag[bmuIndex] = "";
+		//~ writeLog("BMU"+ bmu + " OFF");
+        setCommand("stop",bmuIndex);
+        if(timerID[bmuIndex] > 0) { //if a timer for <bmu> is active
+			count60(0, bmuIndex,-1); // cancel the active timer for <bmu>
+			timerID[bmuIndex] = 0; // clear the timer I for <bmu>
+		}
+		playAlarm(0,bmuIndex); //stop alarm sound
+    }
+    
+    function enterStop( side ){
+		if (side == "PORT"){
+			var bmus = [0,1];
+			portBtnState={"drivePort":0,"stopPort":1,"chargePort":0,"balancePort":0};
+		}
+		else if (side == "STBD"){
+			var bmus = [2,3];
+			starBtnState={"driveStar":0,"stopStar":1,"chargeStar":0,"balanceStar":0};
+		}
+		execStop(bmus[0]);
+		execStop(bmus[1]);
+		writeLog(side + " String has turned OFF.");
+		count60(0, bmus[0],-1);
+		count60(0, bmus[1],-1);
+		setBtnState();	
+	}
+
+
+	// arguments: bmuIndex is in set {0,1,2,3}
+	//   purpose: set command to "balance_<lowest string voltage>"
+	function execBalance(bmuIndex) {
+		//calculate min cell voltage
+		var arrayMinMaxVals=getMinMaxV(); //get array of portmin,portmax,starmin,starmax voltages
+		
+		bmuBalance[bmuIndex]=1; // set balancing flag for the bmu
+		bmuLastFlag[bmuIndex]="";  //
+		if(bmuIndex == 0 || bmuIndex == 1)  // port check
+			var minVol=arrayMinMaxVals[0];
+		else if(bmuIndex == 2 || bmuIndex == 3) // otherwise it's a stbd check
+			var minVol=arrayMinMaxVals[2];
+		
+		var mV=parseInt(parseFloat(minVol)*10000);
+		if(bmuIndex == 0)
+			writeLog("Balance PORT");
+		else if(bmuIndex == 2)
+			writeLog("Balance STBD");
+		setCommand("balance_"+mV,bmuIndex);
+		//writeLog("BMU"+ bmu + " balance initiating in 5 minutes.");
+		//setTimeout(function(){ setCommand("balance_"+mV,bmu) },300000);
+	}
+
+	// arguments: bmuIndex in set {0,1,2,3}
+	//   purpose: set command to "drive"
+	function execDrive(bmuIndex) {
+		var bmuId = bmuIndex+1;
+		bmuLastFlag[bmuIndex] = "";
+		if (bmuIndex == 1)
+			writeLog("PORT ON");
+		else if (bmuIndex == 3)
+			writeLog("STBD ON");
+		setCommand("drive",bmuIndex);
+	}
+
+	// arguments: 
+	//   purpose: 
+	function execCharge(type, section) {
+		var chargeCmd = "";
+		var txt = "";
+		var timer = "";
+		if(type == "storage") {
+			chargeCmd = "charge_37000"; //storage
+			txt = "Storage";
+		}
+		else {
+			chargeCmd = "charge_42000"; //full
+			txt = "Full";
+		}
+		
+		if(section == "port") {
+			/*$.ajax({ url: 'Charger1Start.php?r=1',
+				type: 'GET',
+				async: false
+			});*/
+
+			setCommand(chargeCmd,0);
+			setCommand(chargeCmd,1);
+			writeLog(txt +" charge PORT. Connecting to charger...");
+			
+		}
+		else if (section == "star") {
+			/*$.ajax({ url: 'Charger2Start.php?r=1',
+				type: 'GET',
+				async: false
+			});*/
+			
+			setCommand(chargeCmd,2);
+			setCommand(chargeCmd,3);
+			writeLog(txt +" charge STBD. Connecting to charger...");	
+		}
+	}
+	
+	function chargeCycle(type,section) {
+		
+		var startCycle=0;
+		
+		if(section=="port") {
+			var lCom1=getLastActionCmd("1");
+			var lCom2=getLastActionCmd("2");
+			if(debug) console.log("port lc: " + lCom1 + " " + lCom2 + " " + chargeBtn[0]);
+			//if charge not last command
+			if(	(lCom1.indexOf("charge") > -1 && lCom2.indexOf("charge") > -1) || chargeBtn[0]==1 ) {
+				startCycle=1;
+				chargeBtn[0]=0;
+			}
+		}
+		else {
+			var lCom3=getLastActionCmd("3");
+			var lCom4=getLastActionCmd("4");
+			if(debug) console.log("stbd lc: " + lCom3 + " " + lCom4 + " " + chargeBtn[1]);
+			if(	(lCom3.indexOf("charge") > -1 && lCom4.indexOf("charge") > -1) || chargeBtn[1]==1 ) {
+				startCycle=1;
+				chargeBtn[1]=0;
+			}
+		}
+		
+		if(startCycle) {
+			execCharge(type,section);
+			var next=0;
+		
+			var timerCC = setTimeout(function(){
+				if(section=="port") {
+					if(debug) { console.log("current: " + parseFloat(bmu[0].Current) + " " + parseFloat(bmu[0].Current)); }
+					var lCom5=getLastActionCmd("1");
+					var lCom6=getLastActionCmd("2");
+					if(	lCom5.indexOf("charge") > -1 && lCom6.indexOf("charge") > -1){
+						if((parseFloat(bmu[0].Current) < 1) || (parseFloat(bmu[1].Current) < 1)) {		
+							$.ajax({ url: 'Charger1Start.php?r=1',
+								type: 'GET',
+								async: false
+							});	
+							chargeCount[0]++;		
+							if (chargeCount[0]<5){
+								if (chargeCount[0]>1) writeLog("Connection to PORT charger failed.  Re-attempt in 5 seconds");
+								execStop(0);
+								execStop(1);
+								next=1;
+								chargeBtn[0]=1;
+							}
+							else {
+								writeLog("Connection to PORT charger failed. Check all connection and try again");
+								
+								execStop(0);
+								execStop(1);
+								//$("#stopPort").trigger("click");
+							}
+							
+						}
+						else{ // successful connection
+							writeLog("Connection to PORT charger successful. Battery is charging.");
+						}
+					}
+				}
+				else if (section=="star"){
+					if(debug) { console.log("current: " + parseFloat(bmu[2].Current) + " " + parseFloat(bmu[3].Current)); }
+					var lCom7=getLastActionCmd("3");
+					var lCom8=getLastActionCmd("4");
+					if(	lCom7.indexOf("charge") > -1 && lCom8.indexOf("charge") > -1){
+						if((parseFloat(bmu[2].Current) < 1) || (parseFloat(bmu[3].Current) < 1)) {
+							$.ajax({ url: 'Charger2Start.php?r=1',
+								type: 'GET',
+								async: false
+							});
+							chargeCount[1]++;
+							if (chargeCount[1]<5){
+								execStop(2);
+								execStop(3);
+								if (chargeCount[1]>1) writeLog("Connection to STBD charger failed.  Re-attempt in 5 seconds");
+								next = 1;
+								chargeBtn[1] = 1;
+							}
+							else {
+								writeLog("Connection to STBD charger failed. Check all connection and try again");
+								execStop(2);
+								execStop(3);
+								//$("#stopStar").trigger("click");
+							}
+						}
+						else{ // successful connection
+							writeLog("Connection to STBD charger successful. Battery is charging.");
+						}
+					}
+				}
+
+				//send charge command again
+				if(next==1) {
+					clearTimeout(timerChargeCycle);
+					//setTimeout runs once only
+					timerChargeCycle = setTimeout(function(){ chargeCycle(type,section); },5000); //wait x mseconds, send charge
+				}
+			},15000); //wait x mseconds, send stop
+		} //end if startCycle
+	}
+	
+	// arguments: bmuIndex {0,1,2,3}
+	//   purpose: sets the command to "clearstop" and kills all count down timers
+	function execClearStop(bmuIndex) {
+		var bmuId = bmuIndex + 1;
+		if (bmuIndex == 1)
+			writeLog("Turn PORT OFF and Reset");
+		else if (bmuIndex == 3)
+			writeLog("Turn STBD OFF and Reset");
+		bmuClear[bmuIndex] = 1;
+        setCommand("clearstop",bmuIndex);
+        bmuPrevDataTime[bmuIndex] = getLastDataTime(bmuIndex);
+        if(timerID[bmuIndex]) {
+			count60(0, bmuIndex,-1);
+			timerID[bmuIndex] = 0;
+		}
+    }
+   
+	function startComm() {
+		var isComm='';
+		$.ajax({ url: 'restart.php?r=1',
+		 type: 'GET',
+		 async: false,
+		 success: function(data) {
+				isComm=data;	
+			}
+		 });
+		 return isComm;
+	 }
+    
+    function currentDateTime() {
+		var myDate = new Date();
+		var month = myDate.getMonth()+1;
+		var day = myDate.getDate();
+		var year = myDate.getFullYear();
+		var hour = myDate.getHours();
+		var minute = myDate.getMinutes();
+		var second = myDate.getSeconds();
+		var ms = myDate.getMilliseconds();
+		var dateTime = '';
+		
+		if(month < 10) month = '0' + month;
+		if(day < 10) day = '0' + day;
+		if(hour < 10) hour = '0' + hour;
+		if(minute < 10) minute = '0' + minute;
+		if(second < 10) second = '0' + second;
+		dateTime =  year + '-' + month + '-' + day + ' ' + hour + ':' + minute + ':' + second + "." + ms;
+		
+		return dateTime;
+	}
+
+	function writeLog( logText ) {
+		var elem = document.getElementById("textlog");
+		elem.innerHTML += "<small>" + logText + ' - ' + currentDateTime() + "</small><br/>";
+		elem.scrollTop = elem.scrollHeight;
+	}
+
+    
+    function count60(status, bmuIndex,flagIndex) { //bmu should be in the range 1-4
+		var popUpIdStr = bmuIndex+1;
+		//start timer
+		//writeLog("Count 60 entered. Status="+status+" and bmuIndex =" +bmuIndex);
+		if(status) {
+			writeLog("In 60 seconds, " + hsNames[bmuIndex]+ " will enter OFF MODE");
+			timerID[bmuIndex] = setTimeout(
+				function() {
+					if(bmuIndex == 0 || bmuIndex == 1) {
+						//~ $("#stopPort").trigger("click");
+						enterStop("PORT");
+					}
+					else if (bmuIndex == 2 || bmuIndex == 3) {
+						//~ $("#stopStar").trigger("click");
+						enterStop("STBD");
+					}
+					$("#flagpop"+popUpIdStr).wijdialog("close");
+					$("#flagpop"+popUpIdStr).hide();
+				}, 49000);
+			//writeLog("Status 1-timerID[bmu] : " + timerID[bmuIndex]);
+		}
+		else {
+			clearTimeout(timerID[bmuIndex]);
+			$("#flagpop"+popUpIdStr).wijdialog("close");
+			$("#flagpop"+popUpIdStr).hide();
+			//writeLog(hsNames[bmuIndex]+ " is no longer entering OFF MODE");
+			//writeLog("Status 0- timerID[bmu] " + timerID[bmuIndex]);
+		}
+	}
+	
+	// gets json data string for specified bmu#
+	function getData(bmuIndex) {
+		var bmuId = bmuIndex + 1;
+		var jsonstr="";
+		$.ajax({ url: 'db.php?key=all&b='+bmuId.toString(),
+			type: 'GET',
+			async: false,
+			success: function(data) {
+				jsonstr=data;
+			},
+			error: function() {
+				writeLog("Database communication error.  Could not retrieve data.");
+			}
+		 });
+		 
+		 //set data timestamp
+		 
+		 bmuDataTime[bmuIndex] = getLastDataTime(bmuIndex); //new latest data time in database
+		 return jsonstr;
+	 }
+
+    function pulsateBgRed()
+    {
+		/*bgTimerID = setInterval(function () {
+			$("body").stop().css("background-color", "red")
+			$("body").animate({
+				backgroundColor : "white"
+				}, 500);
+		}, 10000);*/
+		$("body").stop().css("background-color", "red")
+		$("body").animate({
+			backgroundColor : "white"
+		}, 250); //time it takes to turn red
+	}
+
+	// arguments: none
+	//   purpose: sets the background color to white
+	function setBgWhite()
+	{
+		//clearInterval(bgTimerID);
+		$("body").stop().css("background-color", "white");
+	}
+
+	// arguments:
+	//   purpose:	
+	function setTabRed(bmuIndex) {
+		var bmuId = bmuIndex + 1;
+		$("#t-"+bmuId+" a").addClass("red");
+	}
+	
+	// arguments:
+	//   purpose:
+	function clearTabRed(bmuIndex) {
+		var bmuId = bmuIndex + 1;
+		$("#t-"+ bmuId +" a").removeClass("red");
+	}
+	
+	// arguments:
+	//   purpose: indicator light controls
+    function setFaultLight(status,bmuIndex) {
+		var element="";
+		switch(bmuIndex) {
+				case(0):
+					element = "portAFTLight";
+					break;
+				case(1):
+					element = "portFWDLight";
+					break;
+				case(2):
+					element = "starAFTLight";
+					break;
+				case(3):
+					element = "starFWDLight";
+					break;
+		}
+		if (status){
+			 document.getElementById(element).src = "./red.png";
+		}
+		else{
+			 document.getElementById(element).src = "./neutral.png";
+		}
+	}
+
+	// arguments:
+	//   purpose: 
+    function setFlagLight(lightState,bmuIndex,lightID) {
+		bmuId = bmuIndex+1;
+		var element=lightID+"FlagLight"+bmuId;
+		if(debug) console.log(element + " " + lightState);
+		if(lightState == 1) {
+			document.getElementById(element).src = "./red.png";
+		}
+		else if (lightState == 2) {
+			document.getElementById(element).src = "./orange.png";
+		}
+		else
+			document.getElementById(element).src = "./neutral.png";
+    }
+
+	// arguments: lightState {0,1}, bmuIndex {0,1,2,3}
+	//   purpose: changes balance recommend light between blue=1 and neutral=0
+    function setBalanceRecLight(lightState,bmuIndex) {
+		var element = "";
+		if(bmuIndex < 2)
+			element = "portBRLight";
+		else
+			element = "starBRLight";
+		
+		if (lightState == 1) document.getElementById(element).src = "./blue.png";
+		else document.getElementById(element).src = "./neutral.png";
+    }
+    
+    // arguments:
+	//   purpose:
+    function clearBMULights(bmuIndex) {
+		var lightIDs=["Water","T","PR","P","V","BMEError","Comm","Cur"];
+		var bmuId=bmuIndex+1;
+		for(var i=0; i < 8; i++) {
+			var element=lightIDs[i]+"FlagLight"+bmuId;
+			document.getElementById(element).src = "./neutral.png";
+		}
+	}
+
+	//end indicator light controls
+
+ 
+	// #### SET UI GAUGE AND TEXT VALUES ####
+    
+    // arguments:
+	//   purpose:
+    function setSOC()
+    {
+		//GET LOWEST VALUE FOR PORT AND STARBRD
+		//port
+		var soc1=parseInt(bmu[0].SOC);
+		var soc2=parseInt(bmu[1].SOC);
+		if( soc1 <= soc2 )
+			var soc=soc1;
+		else
+			var soc=soc2;
+		var barImg = "";
+		if(soc < 10)
+			barImg = "./soc-error.png";
+		else if(soc < 20)
+			barImg= "./soc-warning.png";
+		else
+			barImg = "/soc-normal.png";
+
+        $("#SOC").wijprogressbar("option", { value: soc, indicatorImage: barImg});
+        $("#SOC").wijprogressbar("redraw");
+
+		//star
+		var soc3=parseInt(bmu[2].SOC);
+		var soc4=parseInt(bmu[3].SOC);
+		if( soc3 <= soc4 )
+			var soc=soc3;
+		else
+			var soc=soc4;
+		barImg = "";
+		if(soc < 10)
+			barImg = "./soc-error.png";
+		else if(soc < 20)
+			barImg= "./soc-warning.png";
+		else
+			barImg = "/soc-normal.png";
+
+        $("#SOC2").wijprogressbar("option", { value: soc, indicatorImage: barImg});
+        $("#SOC2").wijprogressbar("redraw");       
+    } 
+	//set voltage gauges, text values
+    // arguments:
+	//   purpose:
+    function setVoltage() {
+        var portVf = parseFloat(bmu[0].Total_V) + parseFloat(bmu[1].Total_V);
+        var starVf = parseFloat(bmu[2].Total_V) + parseFloat(bmu[3].Total_V);
+        var portV=portVf.toFixed(1).toString();
+        var starV=starVf.toFixed(1).toString();
+        $("#PVGauge").wijlineargauge("option", { value: portV});
+        document.getElementById("VText1").innerHTML = portV + " V";
+        $("#SVGauge").wijlineargauge("option", { value: starV});
+        document.getElementById("VText2").innerHTML = starV + " V";
+    }
+	
+	//set power gauges, text values
+    // arguments:
+	//   purpose:
+    function setPower() {
+		//get currents
+		var bmu0A=bmu[0].Current;
+		var bmu1A=bmu[1].Current;
+		var bmu2A=bmu[2].Current;
+		var bmu3A=bmu[3].Current;
+		
+		//if one is 0, assign other's value
+		if(bmu0A=="0.0")
+			bmu0A=bmu1A;
+		else if(bmu1A=="0.0")
+			bmu1A=bmu0A;
+		
+		if(bmu2A=="0.0")
+			bmu2A=bmu3A;
+		else if(bmu3A=="0.0")
+			bmu3A=bmu2A;
+		
+        var portAf = Math.abs((parseFloat(bmu0A) + parseFloat(bmu1A))/2);
+        var starAf = Math.abs((parseFloat(bmu2A) + parseFloat(bmu3A))/2);
+        
+        //get voltages
+		var portVf = parseFloat(bmu[0].Total_V) + parseFloat(bmu[1].Total_V);
+		var starVf = parseFloat(bmu[2].Total_V) + parseFloat(bmu[3].Total_V);
+		
+		//calculate power kW
+		var pPort = portAf*portVf/1000;
+		var pStar = starAf*starVf/1000;
+
+		//one decimal place
+		var APortTxt = portAf.toFixed(1).toString();
+        var AStarTxt = starAf.toFixed(1).toString();
+        var pPortTxt = pPort.toFixed(1).toString();
+        var pStarTxt = pStar.toFixed(1).toString();
+        //set port power gauge text value; amp text value
+        $("#PPGauge").wijlineargauge("option", { value: pPort});
+        document.getElementById("PText1").innerHTML = pPortTxt + " kW";
+        document.getElementById("AText1").innerHTML = APortTxt + " A";
+        
+        //set stbd power gauge and text value; amp text value
+        $("#SPGauge").wijlineargauge("option", { value: pStar});
+        document.getElementById("PText2").innerHTML = pStarTxt + " kW";
+        document.getElementById("AText2").innerHTML = AStarTxt + " A";
+    }
+	//set port and stbd maxTemps
+	// arguments:
+	//   purpose:
+	function setMaxTempTxt() {
+		//get temps
+		var bmu0maxT=parseFloat(bmu[0].maxT);
+		var bmu1maxT=parseFloat(bmu[1].maxT);
+		var bmu2maxT=parseFloat(bmu[2].maxT);
+		var bmu3maxT=parseFloat(bmu[3].maxT);
+		
+		document.getElementById("maxTempPAFT").innerHTML = bmu0maxT.toPrecision(3) + " C";
+		document.getElementById("maxTempPFWD").innerHTML = bmu1maxT.toPrecision(3) + " C";
+		document.getElementById("maxTempSAFT").innerHTML = bmu2maxT.toPrecision(3) + " C";
+		document.getElementById("maxTempSFWD").innerHTML = bmu3maxT.toPrecision(3) + " C";
+	}
+	
+	//set pressure text
+	// arguments:
+	//   purpose:
+	function setPressureTxt() {
+		//get pressures
+		var bmu0p=parseFloat(bmu[0].pressure);
+		var bmu1p=parseFloat(bmu[1].pressure);
+		var bmu2p=parseFloat(bmu[2].pressure);
+		var bmu3p=parseFloat(bmu[3].pressure);
+		
+		document.getElementById("pressPAFT").innerHTML = bmu0p.toPrecision(2) + " GPSI";
+		document.getElementById("pressPFWD").innerHTML = bmu1p.toPrecision(2) + " GPSI";
+		document.getElementById("pressSAFT").innerHTML = bmu2p.toPrecision(2) + " GPSI";
+		document.getElementById("pressSFWD").innerHTML = bmu3p.toPrecision(2) + " GPSI";
+	}	
+ 
+	// get min number from array of numbers
+	Array.min = function( array ){
+		return Math.min.apply( Math, array );
+	};
+	
+	// get max number from array of numbers
+	Array.max = function( array ){
+		return Math.max.apply( Math, array );
+	};	
+	
+	// arguments:
+	//   purpose:
+	function getMinMaxV()
+	{
+		//port
+        var min_values1 = [parseFloat(bmu[0].minV),parseFloat(bmu[1].minV)];
+		var minVo1 = Array.min(min_values1);
+
+        var max_values1 = [parseFloat(bmu[0].maxV),parseFloat(bmu[1].maxV)];
+		var maxVo1 = Array.max(max_values1);
+		
+		//stbd
+        var min_values2 = [parseFloat(bmu[2].minV),parseFloat(bmu[3].minV)];
+		var minVo2 = Array.min(min_values2);
+
+        var max_values2 = [parseFloat(bmu[2].maxV),parseFloat(bmu[3].maxV)];
+		var maxVo2 = Array.max(max_values2);
+
+        var vals = new Array(minVo1,maxVo1,minVo2,maxVo2);
+        return vals;
+    }
+	
+	//set UI value of min and max voltages
+    // arguments:
+	//   purpose:
+    function setMinMaxV()
+    {
+		var MinMaxVs=getMinMaxV();
+		var minVo1=MinMaxVs[0]
+		var maxVo1=MinMaxVs[1]
+		var minVo2=MinMaxVs[2]
+		var maxVo2=MinMaxVs[3]
+	
+		document.getElementById("minVText1").innerHTML = minVo1.toPrecision(4) + " V";
+        document.getElementById("maxVText1").innerHTML = maxVo1.toPrecision(4) + " V";
+        document.getElementById("minVText2").innerHTML = minVo2.toPrecision(4) + " V";
+        document.getElementById("maxVText2").innerHTML = maxVo2.toPrecision(4) + " V";
+    }
+ 
+	//set UI values for footer each half-string tab
+	// arguments:
+	//   purpose:
+	function setHalfStringData(bmunum) {
+		var tmp=bmunum+1;
+		document.getElementById("vbmu"+tmp).innerHTML = bmu[bmunum].Total_V;
+		document.getElementById("ibmu"+tmp).innerHTML = bmu[bmunum].Current;
+		document.getElementById("pbmu"+tmp).innerHTML = bmu[bmunum].pressure;
+	}
+
+	// arguments:
+	//   purpose:
+	function getLastCmd(bmu) {
+		var lst='';
+		$.ajax({ url: 'db.php?key=last&b='+bmu,
+		 type: 'GET',
+		 async: false,
+		 success: function(data) {
+				lst=data;		
+			}
+		 });
+		 return lst;
+	 }
+
+	// arguments:
+	//   purpose:
+	function getLastActionCmd(bmu) {
+		var lst='';
+		$.ajax({ url: 'db.php?key=lastac&b='+bmu,
+		 type: 'GET',
+		 async: false,
+		 success: function(data) {
+				lst=data;		
+			}
+		 });
+		 return lst;
+	 }
+
+	// arguments:
+	//   purpose:
+    function updateVoltage( cellClass, value, bmunum )
+    {
+        var floatval = parseFloat(value);
+		var output = "";
+        if (floatval < 3)
+            output = '<span class="text-error">'+value+'</span>';
+        else if (floatval >= 3 && floatval < 3.2)
+			output = '<span class="text-warning">'+value+'</span>';
+        else
+            output = value;
+		
+		var dom_location="table#bmu"+bmunum + " tr td." + cellClass; //dom location of table square where value will go
+		//$("table#bmu1 tr td.B1V1").html('2.2');
+		$(dom_location).html(output);
+    }
+    
+    // arguments:
+	//   purpose:
+    function updateTemp( cellClass, value, bmunum )
+    {
+		var floatval = parseFloat(value);
+		
+		//find max temp -- exclude T4 (HS) **********************
+		if(cellClass.indexOf("T4") == -1)
+		{
+			if(floatval > thisMaxTemp)
+				thisMaxTemp=floatval;
+			if(floatval < thisMinTemp)
+				thisMinTemp=floatval;
+		}
+        
+		var output = "";
+		if (floatval > 110)
+			output = '<span class="text-error">'+value+'</span>';
+		else if (floatval > 65 && (cellClass.indexOf("T4") == -1))
+			output = '<span class="text-error">'+value+'</span>';
+        else if (floatval > 40 && (cellClass.indexOf("T4") == -1) && (cellClass.indexOf("TI") == -1))
+			output = '<span class="text-error">'+value+'</span>';
+        else if (floatval <= -2)
+			output = '<span class="text-error">'+value+'</span>';			
+		else
+			output = value;
+
+		var dom_location="table#bmu"+bmunum + " tr td." + cellClass; //dom location of table square where value will go
+		//$("table#bmu1 tr td.B1V1").html('2.2');
+		$(dom_location).html(output);			
+    }
+
+	// arguments:
+	//   purpose:
+    function updateCell( cellClass, value, bmunum )
+    {
+        var floatval = parseFloat(value);
+		var output="";
+        if (floatval > 55)
+			output = '<span class="text-error">'+value+'</span>';
+		else
+			output = value;
+
+		var dom_location="table#bmu"+bmunum + " tr td." + cellClass; //dom location of table square where value will go
+		//$("table#bmu1 tr td.B1V1").html('2.2');
+		$(dom_location).html(output);
+    }
+
+	// arguments: bmuIndex in set {0,1,2,3}. {0,1} PORT and {2,3} STBD
+	//   purpose: update the bmuOverrideFlagList
+	function checkFlagOverride(bmuIndex) 
+	{	
+		//writeLog([1,23,4,5,8,0,14].indexOf(0));
+		var n = 0;
+		var flagToCheck = [];
+		var flagIndexToRemove=[];
+		
+		while(n < bmuOverrideFlagList[bmuIndex].length){
+			
+			flagToCheck = bmuOverrideFlagList[bmuIndex][n];  // flag in n'th spot in override list
+			flagIndexToRemove = bmuActiveFlagList[bmuIndex].indexOf(flagToCheck);	// index location in the active flag list
+			//if (bmuIndex == 0){
+				//writeLog("bmuIndex::"+bmuIndex);
+				//writeLog("Activelist::"+bmuActiveFlagList[bmuIndex]);
+				//writeLog("overridelist::"+bmuOverrideFlagList[bmuIndex]);
+				//writeLog("flagtocheck::"+flagToCheck);
+				//writeLog("flagindextoremove::"+flagIndexToRemove);
+			//}
+			if(flagIndexToRemove < 0){  // if that flag is no longer active
+				//writeLog("Active Flags "+bmuActiveFlagList[bmuStr]);
+				//writeLog("Removflagpop1ing "+ bmuOverrideFlagList[bmuStr][n]+"in position" +n + "From the list "+bmuOverrideFlagList[bmuStr]);
+				bmuOverrideFlagList[bmuIndex].splice(n,1);
+				n--;
+			}
+			n++;	
+		}
+		//	if override list is empty and you are in override mode
+		// then you're finished overriding
+		if(bmuOverrideFlagList[bmuIndex].length <= 0 && bmuOverride[bmuIndex] == 2) {
+			writeLog("Override: "+hsNames[bmuIndex]+" is no longer entering OFF");
+			bmuOverride[bmuIndex] = 1;
+			setCommand(getLastActionCmd(bmuIndex+1),bmuIndex);
+		}
+	}
+	
+	// arguments:
+	//   purpose:
+	function processTheFlags(bmuIndex){
+		// if the last flag is empty, set it to zero
+		if(bmuLastFlag[bmuIndex] == "") bmuLastFlag[bmuIndex] = 0;
+		
+		//if the flag hasn't changed, no need to reprocess flags
+		if(bmuLastFlag[bmuIndex] == bmu[bmuIndex].Flag){
+			return
+		}
+		else{ // update last flag to curent flag and process new flags
+			//writeLog("Flags are different: PROCESS THAT STUFF");
+			bmuLastFlag[bmuIndex] = bmu[bmuIndex].Flag;
+			//writeLog("FFFF" + bmuActiveFlagList[bmuIndex]+ "FFFF");
+			//writeLog("PPPP" + bmuActivePriorityList[bmuIndex]+ "PPPP");
+		}			
+		
+		var bmuId = bmuIndex+1;
+		var bmuIndexStr = bmuIndex.toString();
+		var logtxt = "";
+		if(bmuIndex == 0)
+			logtxt="**PORT AFT ";
+		else if(bmuIndex == 1)
+			logtxt="**PORT FWD ";
+		else if(bmuIndex == 2)
+			logtxt="**STAR AFT ";
+		else if(bmuIndex == 3)
+			logtxt="**STAR FWD ";
+		
+		
+		clearTabRed(bmuIndex); // start with fresh tab colors
+		// check if any flag is the higest priority = 1
+		var priorityOneInd = bmuActivePriorityList[bmuIndex].indexOf(1);
+		if (priorityOneInd > -1){
+			setFaultLight(1,bmuIndex);
+			setTabRed(bmuIndex);
+			playSound("alarm_stop");
+			var priorityOneFlag = bmuActiveFlagList[bmuIndex][priorityOneInd];
+			var desc = getFlagsDescription(priorityOneFlag);
+			writeLog(logtxt + desc);
+			if(bmuIndex < 2) {
+				enterStop("PORT");
+			}
+			else {
+				enterStop("STBD");
+			}
+			
+		}
+		// if no priority 1's are found, process all flags > 2
+		else{
+			var priorityTwoList=[]; // list of priority two flags
+			var p2desc=""; // description of priority two flags
+			
+			for(var n = 0; n < bmuActiveFlagList[bmuIndexStr].length;n++) {
+				var flagIndex = bmuActiveFlagList[bmuIndexStr][n];
+				var desc = getFlagsDescription(flagIndex);
+				//writeLog("PRIORITY 1-4::"+bmuActivePriorityList[bmuIndex][n]);
+				//writeLog("flagpriority="+flagPriority+"flagIndex"+flagIndex);
+				switch(bmuActivePriorityList[bmuIndex][n]) {
+					case(1): // shouldn't be any priority ones here... if we are here
+						break;
+					case(2):	
+						priorityTwoList.push(flagIndex);
+						p2desc += desc + "<br>";
+					case(3):
+					case(4):
+						setFaultLight(1,bmuIndex);
+						setTabRed(bmuIndex);
+						writeLog(logtxt + desc);
+						break;
+					case(5):
+					case(6):
+						writeLog(logtxt + desc);
+						if(flagIndex == 20){
+							playSound("donenotification");
+							if(bmuIndex < 2) {
+								/*execStop(1);
+								execStop(2);
+								setBtn("stopPort");*/
+								$("#stopPort").trigger("click");
+							}
+							else {
+								/*execStop(3);
+								execStop(4);
+								setBtn("stopStar");*/
+								$("#stopStar").trigger("click");
+							}
+						}
+						if(flagIndex == 21){
+							execStop(bmuIndex);
+							bmuBalance[bmuIndex] = 0;
+							if(debug) console.log("bmuBalance: " + bmuBalance);
+							if(bmuIndex < 2) {
+								//turn off btn red after both bmu's are balanced
+								if(!bmuBalance[0] && !bmuBalance[1]) {
+									//setBtn("stopPort");
+									playSound("donenotification");
+									$("#stopPort").trigger("click");
+								}
+							}
+							else {
+								if(!bmuBalance[2] && !bmuBalance[3]) {
+									//setBtn("stopStar");
+									playSound("donenotification");
+									$("#stopStar").trigger("click");
+								}
+							}
+						}	
+						break;
+				} //end switch
+			}	//end of for loop
+			//writeLog("this is the 2 LIST "+ priorityTwoList+ "\n" + p2desc);
+			
+			//if you found priority 2 flags, create a pop-up asking to
+			if (priorityTwoList.length > 0){
+				pulsateBgRed();
+				playAlarm(1,bmuIndex);
+				throwPopUp(p2desc,priorityTwoList,bmuIndex);	
+			}
+
+	} //end of else	
+	} //end of processTheFlags
+
+
+	// arguments:
+	//   purpose:
+	function throwPopUp(txt, p2List, bmuIndex) 
+	{	
+		var bmuIndexStr = bmuIndex.toString();
+		var popUpIdStr = bmuIndex+1;
+		//writeLog("throwPopUp:: popUpIdStr="+popUpIdStr);
+		var txt1=txt+"<br> <b>The effected battery string will turn off in 60 seconds.</b>";
+		$("#flagpop"+popUpIdStr).show();
+		document.getElementById("flagpop"+popUpIdStr).innerHTML = txt1;
+		
+		if(bmuIndex == 0 || bmuIndex == 1){
+			side = "Port";
+		}
+		else{
+			var side="Star";
+		}
+		count60(0, bmuIndex,-1); //clear any old timers,
+		count60(1, bmuIndex,-1); //start a fresh countdown
+		if(side == "Port") {
+			$("#flagpop"+popUpIdStr).wijdialog({
+				autoOpen: true,
+				resthrowPopUpizable: false,
+				height: 310,
+				width: 550,
+				modal: true,
+				buttons: {
+					"PORT OFF": function () {
+						$("#flagpop"+popUpIdStr).wijdialog("close");
+						$("#flagpop"+popUpIdStr).hide();
+						execStop(0);
+						execStop(1);
+						writeLog("PORT String has turned OFF.");
+						count60(0, bmuIndex,-1);
+						portBtnState={"drivePort":0,"stopPort":1,"chargePort":0,"balancePort":0};
+						setBtnState();
+					},
+					"Override": function () {
+						$("#flagpop"+popUpIdStr).wijdialog("close");
+						$("#flagpop"+popUpIdStr).hide();
+						writeLog(hsNames[bmuIndex]+" Override "+txt+".");
+						//setCommand("override_"+flagID,numBmu);
+						for(var n=0;n < p2List.length; n++){
+							var flagIndex = p2List[n];
+							if(bmuOverrideFlagList[bmuIndexStr].indexOf(flagIndex) < 0){
+								bmuOverrideFlagList[bmuIndexStr].push(flagIndex);
+							}
+						}
+						var ovFlags="";
+						var n = 0;
+						for(n = 0;n < bmuOverrideFlagList[bmuIndexStr].length;n++){
+							ovFlags = ovFlags+"_"+(bmuOverrideFlagList[bmuIndexStr][n]+1);
+						}
+						bmuOverride[bmuIndex] = 2;
+						setCommand("override"+ovFlags,bmuIndex);
+						playAlarm(0,bmuIndex);
+						count60(0, bmuIndex,-1);
+						if(debug) console.log("Port override"+ovFlags);
+					}
+				}
+			});
+		}
+		else {
+			$("#flagpop"+popUpIdStr).wijdialog({
+				autoOpen: true,
+				resizable: false,
+				height: 310,
+				width: 550,
+				modal: true,
+				buttons: {
+					"STBD OFF": function () {
+						$("#flagpop"+popUpIdStr).wijdialog("close");
+						$("#flagpop"+popUpIdStr).hide();
+						execStop(2);
+						execStop(3);
+						writeLog("STBD String has turned OFF.");
+						count60(0, bmuIndex, -1);
+						starBtnState={"driveStar":0,"stopStar":1,"chargeStar":0,"balanceStar":0};
+						setBtnState();
+					},
+					"Override": function () {
+						$("#flagpop"+popUpIdStr).wijdialog("close");
+						$("#flagpop"+popUpIdStr).hide();
+						writeLog(hsNames[bmuIndex]+" Override "+txt+".");
+						//setCommand("override_"+flagID,numBmu);
+						for(var n=0;n < p2List.length; n++){
+							var flagIndex=p2List[n];
+							if(bmuOverrideFlagList[bmuIndexStr].indexOf(flagIndex) < 0){
+								bmuOverrideFlagList[bmuIndexStr].push(flagIndex);
+							}
+						}
+						var ovFlags="";
+						var n=0;
+						for(n=0;n<bmuOverrideFlagList[bmuIndexStr].length;n++){
+							ovFlags=ovFlags+"_"+(bmuOverrideFlagList[bmuIndexStr][n]+1);
+						}
+						bmuOverride[bmuIndex] = 2;
+						setCommand("override"+ovFlags,bmuIndex);
+						playAlarm(0,bmuIndex);
+						count60(0, bmuIndex,-1);
+						if(debug) console.log("Port override"+ovFlags);
+					}
+				}
+			});
+		}
+    }
+    
+    function getFlagsDescription(flagIndex){
+		return flagObj[flagIndex]["desc"];
+	}
+    
+    function getFlagsPriorityLevel(flagIndex,bmuIndex){
+		var bmuId= bmuIndex+1;
+		var priorityLevel = 0;
+		var str = "";
+		str = getLastActionCmd(bmuId); // supposed state of BMU
+		
+		if(str.indexOf("drive") > -1){ // get priority level for the mode from the flag object
+			priorityLevel = flagObj[flagIndex]["drive"];
+		}
+		else if(str.indexOf("stop") > -1){
+			priorityLevel = flagObj[flagIndex]["stop"];
+		}
+		else if(str.indexOf("charge") > -1){
+			priorityLevel = flagObj[flagIndex]["charge"];
+		}
+		else if(str.indexOf("balance") > -1){
+			priorityLevel = flagObj[flagIndex]["balance"];	
+		}
+		return priorityLevel
+	}
+	
+	function setGUIColors(bmuIndex){
+		//writeLog("setGUIColors::");
+		if( noActivePriorities(bmuIndex,new Array(1,2,3,4)) ){
+			setFaultLight(0,bmuIndex);
+			clearTabRed(bmuIndex);
+		}
+		setFlagLightBank(bmuIndex);
+	}
+	
+
+	function setFlagLightBank(bmuIndex){
+		var bmuIndexStr = bmuIndex.toString();
+		var lightBank = [7, 7, 7, 7, 7, 7, 7, 7, 7]; // last one is for balrec
+		var theFlagsPriority = 6;
+		var flagIndex = 0;
+		bmuBalanceRecLight[bmuIndex] = 0;
+		var n=0;
+		for(n = 0; n < bmuActiveFlagList[bmuIndexStr].length;n++) {
+			flagIndex = bmuActiveFlagList[bmuIndexStr][n];
+			theFlagsPriority = getFlagsPriorityLevel(flagIndex,bmuIndex); //get priority from mode and flag object
+			//writeLog("n is"+ n +" active list length is "+ bmuActiveFlagList[bmuIndexStr].length +" long");
+			switch(flagIndex) {
+				case(0):
+					if (theFlagsPriority < lightBank[0])
+						lightBank[0] = theFlagsPriority;
+					break;
+				case(1):
+				case(2):
+				case(3):
+					if (theFlagsPriority < lightBank[1])
+						lightBank[1] = theFlagsPriority;flagpop1
+					break;
+				case(4):
+					if (theFlagsPriority < lightBank[2])
+						lightBank[2] = theFlagsPriority;
+					break;
+				case(5):
+					if (theFlagsPriority < lightBank[3])
+						lightBank[3] = theFlagsPriority;
+					break;
+				case(6):
+				case(7):				
+				case(8):
+				case(9):
+				case(10):			
+				case(11):
+				case(12):
+					if (theFlagsPriority < lightBank[4])
+						lightBank[4] = theFlagsPriority;
+					break;
+				case(13):
+					if (theFlagsPriority < lightBank[5])
+						lightBank[5] = theFlagsPriority;
+					break;
+				case(14):
+				case(15):
+					if (theFlagsPriority < lightBank[6])
+						lightBank[6] = theFlagsPriority;
+					break;				
+				case(16):
+				case(17):
+				case(18):
+					if (theFlagsPriority < lightBank[7])
+						lightBank[7] = theFlagsPriority;
+					break;			
+				case(19):
+					//setFlagLight(lightState,bmu,"V");
+					break;
+				case(20):
+					//setFlagLight(lightState,bmu,"V");
+					break;
+				case(21):
+					//setFlagLight(lightState,bmu,"V");
+					break;
+				case(22):
+					lightBank[8] = 1;
+					bmuBalanceRecLight[bmuIndex] = 1;
+					break;
+			} //end switch
+		}
+		
+		//if(bmuActiveFlagList[bmuIndexStr].length>0)
+			//writeLog("lightBank"+ lightBank);
+		// convert lightBank entries from priority levels to lightStates
+		for(var n=0;n<lightBank.length;n++) {
+			if(lightBank[n]==1 || lightBank[n] == 2 || lightBank[n] == 3)
+				lightBank[n] = 1; //red light
+			else if(lightBank[n] == 4)
+				lightBank[n] = 2;  //orange light
+			else lightBank[n] = 0; // neutral light
+		}	
+		
+		//if(bmuActiveFlagList[bmuIndexStr].length>0)
+			//writeLog("lightBank"+ lightBank);
+		
+		setFlagLight(lightBank[0],bmuIndex,"Water");
+		setFlagLight(lightBank[1],bmuIndex,"T");			
+		setFlagLight(lightBank[2],bmuIndex,"PR");
+		setFlagLight(lightBank[3],bmuIndex,"P");
+		setFlagLight(lightBank[4],bmuIndex,"V");
+		setFlagLight(lightBank[5],bmuIndex,"BMEError");
+		setFlagLight(lightBank[6],bmuIndex,"Comm");
+		setFlagLight(lightBank[7],bmuIndex,"Cur");
+		setBalanceRecLight(lightBank[8],bmuIndex);
+		setFlagLight(bmuOverride[bmuIndex],bmuIndex,"Override");
+		
+	} 
+	
+	
+	// arguments: bmuIndex in {0,1,2,3}
+	//   purpose: sets the bmuComm[bmuIndex] flag to 0 if communication > 10 seconds
+    function checkCommunication(bmuIndex) 
+    {
+		var lastDT = getLastDataTime(bmuIndex); //timestamp
+		var now = new Date().getTime(); //timestamp
+		//writeLog(bmuIndex+"::"+lastDT);
+		//var timeDifference = now - lastDT;
+		//timestamps are in milliseconds
+		if((now - lastDT) >= 10000) {
+			//writeLog("BMU "+bmu+" lost comm.");
+			//writeLog(" checkTime::bmuIndex=" + bmuIndex + "::TD "+ timeDifference);// +now-lastDT);
+            bmuComm[bmuIndex] = 0;
+            return 0;
+		}
+		else {
+			//writeLog(" checkTime::bmuIndex=" + bmuIndex + "::else" +now-lastDT);
+			bmuComm[bmuIndex] = 1;
+			return 1;
+		}
+	}
+	
+	
+	function newBMUDataAcquired(bmuIndex){
+		if  (bmuPrevDataTime[bmuIndex] + 1000 < getLastDataTime(bmuIndex)){
+			//writeLog("Congratulations its a ONE!");
+			return 1
+		}
+		else{
+			//writeLog("So sad, its a zero");
+			return 0
+		}
+	}
+	
+	// arguments: bmuIndex is {0,1,2,3}, {0,1} port and {2,3} stbd 
+	//   purpose: returns 1 if no flags are active
+	// 				returns 0 if any flag is active
+	function noActivePriorities(bmuIndex,priorities){
+		//writeLog("noActivePriorites::" + priorities + " with length of " + priorities.length );
+		var bmuStr = bmuIndex.toString();
+		var priorityExists;
+		for(var n = 0; n < priorities.length; n++){
+			//look for first index of a priority
+			priorityExists = bmuActivePriorityList[bmuIndex].indexOf(priorities[n]);
+			if (priorityExists > -1){ // if you found a flag with the
+									// priority, return false
+				return 0
+			}
+		}
+		return 1 // the active flag list is empty or no specified priority
+				// levels were found
+	}
+	
+	// arguments: bmuIndex is {0,1,2,3}, {0,1} port and {2,3} stbd 
+	//   purpose: returns 1 if no temperature flags are active
+	// 				returns 0 if any of the temperature flags are active
+	function noTempFlagsAreActive(bmuIndex){
+		var bmuIndexStr = bmuIndex.toString();
+		for(var flagIndex = 1; flagIndex < 4;flagIndex++) {
+			if  (bmuActiveFlagList[bmuIndexStr].indexOf(flagIndex) > -1){
+				return 0  // a temperature flag was found, flagIndex!=-1
+			}
+		}
+		return 1
+	}
+	
+	// arguments: bmuIndex is {0,1,2,3}, {0,1} port and {2,3} stbd 
+	//   purpose: Creates an array of active flags ex: [2, 13, 16] means flag ID 3,14,17 are active
+	function createActiveFlagList(bmuIndex){ 
+		var bmuStr=bmuIndex.toString();
+		bmuActiveFlagList[bmuStr]=[];
+		bmuActivePriorityList[bmuStr]=[];
+		var tempFlag= parseInt(bmu[bmuIndex].Flag);
+		//if (bmuIndex == 1)
+			//writeLog("before"+bmuActiveFlagList[bmuStr]);
+		for(var i=0;i<23;i++) {
+			if((tempFlag & Math.pow(2,i)) > 0){
+				bmuActiveFlagList[bmuStr].push(i);	
+				bmuActivePriorityList[bmuStr].push(getFlagsPriorityLevel(i,bmuIndex));
+				//writeLog(getFlagsDescription(i));
+			}
+		}
+		var MinMaxVals=getMinMaxV();
+		//port balance recommend
+		if (bmuIndex == 0 || bmuIndex == 1){
+			//~ //bmuActiveFlagList[bmuStr].indexOf("15") < 0  //6-15
+			//~ var lCom1=getLastActionCmd("1");
+			//~ if (bmuIndex == 1){
+					//~ //writeLog(bmuActiveFlagList[bmuIndex]);
+				//~ if (MinMaxVals[0]>3.9 && MinMaxVals[1]-MinMaxVals[0] >= 0.05 && lCom1.indexOf("balance") == -1  ) {
+					//~ //writeLog("diff is " +(MinMaxVals[1]-MinMaxVals[0])+"and min is "+MinMaxVals[0]);
+					//~ writeLog("I AM HERE");
+					//~ bmuActiveFlagList[0].push(22);
+					//~ bmuActiveFlagList[1].push(22);
+					//~ bmuActivePriorityList[0].push(getFlagsPriorityLevel(22,bmuIndex));
+					//~ bmuActivePriorityList[1].push(getFlagsPriorityLevel(22,bmuIndex));
+				//~ }
+			//~ }
+			if((bmuComm[bmuIndex] == 0) && (bmuActiveFlagList[bmuStr].indexOf("15") < 0)){ //is the bmu not communicating?
+				bmuActiveFlagList[bmuStr].push(15);
+				bmuActivePriorityList[bmuStr].push(getFlagsPriorityLevel(15,bmuIndex));
+				bmu[bmuIndex].Flag += Math.pow(2,15); 
+				//writeLog("YOURE ALWAYS HERE bmuIndex="+bmuIndex); 
+			}
+		}
+		//stbd balance recommend
+		if (bmuIndex == 2 || bmuIndex == 3){
+			//~ var lCom3=getLastActionCmd("3");
+			//~ if (bmuIndex == 3){
+				//~ if (MinMaxVals[2]>3.9 && MinMaxVals[3]-MinMaxVals[2] >= 0.05 && lCom1.indexOf("balance") == -1 ){
+					//~ bmuActiveFlagList[2].push(22);
+					//~ bmuActiveFlagList[3].push(22);
+					//~ bmuActivePriorityList[2].push(getFlagsPriorityLevel(22,bmuIndex));
+					//~ bmuActivePriorityList[3].push(getFlagsPriorityLevel(22,bmuIndex));
+				//~ }
+			//~ }
+			if(bmuComm[bmuIndex] == 0 && bmuActiveFlagList[bmuStr].indexOf("15") < 0){ //is the bmu not communicating?
+				bmuActiveFlagList[bmuStr].push(15);
+				bmuActivePriorityList[bmuStr].push(getFlagsPriorityLevel(15,bmuIndex));
+				bmu[bmuIndex].Flag += Math.pow(2,15); 
+			}
+		}
+		
+		//if (bmuIndex == 1)
+			//writeLog("CreateActiveflagList::"+bmuActiveFlagList[bmuStr]);
+		if (debug && bmuActiveFlagList[bmuStr].length > 0){
+			console.log("????" + bmuActiveFlagList[bmuStr]+ "????");
+		}	
+	}
+
+	function getLastDataTime(bmuIndex) {
+		var bmuId = bmuIndex + 1;
+		var tmpDT='';
+		$.ajax({ url: 'checktime.php?b='+bmuId,
+		 type: 'GET',
+		 async: false,
+		 success: function(data) {
+				tmpDT=data;	
+			}
+		 });
+		 
+		 //parse mysql datetime string
+		 var p = tmpDT.split(/[- :]/);
+		 //var bubbles = new Date(p[0],p[1]-1,p[2],p[3],p[4],p[5]).getTime();
+		 //convert to timestamp
+		 //if (bmu == 1)
+			//writeLog("p======"+bubbles);
+		 return new Date(p[0],p[1]-1,p[2],p[3],p[4],p[5]).getTime();
+	 }
+	
+	// arguments: on is a boolean, bmu is in set {1,2,3,4}
+	//   purpose: play alarm sound file while "on"
+	function playAlarm(on,bmuIndex) {
+		//bmuAlarm[] --> index 0-3
+		if(on) { //turns on the alarm sound
+			bmuAlarm[bmuIndex].loop=true;
+			bmuAlarm[bmuIndex].play();
+		}
+		else { // turns off the alarm sound
+			bmuAlarm[bmuIndex].pause();
+			bmuAlarm[bmuIndex].currentTime = 0;
+		}
+	}
+
+	// arguments: sound is an mp3 file name
+	//   purpose: plays the requested mp3 file
+	function playSound(sound) {
+		var s = new Audio(sound+'.mp3');
+		s.play();
+	}
+
+	//gets latest data and updates UI
+    function updateData()
+    {		
+		//GET LATEST DATA FOR EACH OF THE 4 BMUs; THEN PROCESS
+        var bmuTxt0 = getData(0);
+        var bmuTxt1 = getData(1);
+        var bmuTxt2 = getData(2);
+        var bmuTxt3 = getData(3);
+        		
+		//assign new values to global store; (db script returns 0 on failure)
+		if(bmuTxt0 != "0"){
+			bmu[0]=$.parseJSON(bmuTxt0); //object
+		}
+		if(bmuTxt1 != "0"){
+			bmu[1]=$.parseJSON(bmuTxt1);
+		}        
+ 		if(bmuTxt2 != "0"){
+			bmu[2]=$.parseJSON(bmuTxt2);
+		}
+		if(bmuTxt3 != "0"){
+			bmu[3]=$.parseJSON(bmuTxt3);
+		}
+	
+		//udate UI gauge values
+		setVoltage();
+		setPower();
+		setMinMaxV();
+		setSOC();
+		setMaxTempTxt();
+		setPressureTxt();
+		
+		//iterate through each bmu obj and update half-string table values
+		for(var bmuIndex=0;bmuIndex<bmu.length;bmuIndex++) {
+			
+			var i=bmuIndex;
+			var bmunum=i+1;
+			
+			//checks if its communicated within 10 seconds
+			checkCommunication(bmuIndex); //check for new data in db
+			
+			//create bmuActiveFlagList
+			createActiveFlagList(bmuIndex);
+			
+			//update bmuOverrideFlagList
+			checkFlagOverride(bmuIndex);
+			
+			//set background color white
+			setBgWhite(); //works with pulsateBgRed()
+
+			// checks to see if BMU succesfully received the clearstop 
+			// command and switch to stop
+			checkClearStop(bmuIndex);
+			
+			// checks to see if BMU succesfully received the clear command
+			//  and switch to the previously sent command					
+			checkReset(bmuIndex);
+
+			//checks to see if BMU succesfully received the ignore command
+			checkIgnore(bmuIndex);	
+			
+			//do flag stuff
+			setGUIColors(bmuIndex);
+			processTheFlags(bmuIndex);
+						
+				
+			//setHalfStringTable();	
+			//populate tables
+			var tmpObj=bmu[bmuIndex];
+			for(var key in tmpObj) {
+				if(tmpObj.hasOwnProperty(key)) {
+					//update voltages
+					if(key.match(/B[0-9]{1,2}V[0-9]{1,2}/))
+						updateVoltage(key,tmpObj[key],bmuIndex);
+					//update Vsums
+					else if(key.match(/B[0-9]{1,2}Vsum/))
+						updateVoltage(key,tmpObj[key],bmuIndex);
+					//update temps
+					else if(key.match(/B[0-9]{1,2}T[0-9]{1}/))
+						updateTemp(key,tmpObj[key],bmuIndex);
+					//update TI
+					else if(key.match(/B[0-9]{1,2}TI/))
+						updateCell(key,tmpObj[key],bmuIndex);
+				}
+			} // end for
+			
+			//set 1/2 string tab footer data
+			setHalfStringData(bmuIndex);
+		} //end of for loop
+    }
+    	
+
+	//execute last commands on page load:
+	var n=0;
+	for(n=0;n<lastcmd.length/2;n++) {
+		var str=getLastCmd(2*n+1);
+		var key="Star";
+		if(n<1)
+			key="Port";
+		//~ if(n==0)
+			//~ writeLog("Executing last command PORT: "+lastcmd[n]);
+		//~ else if(n==1)
+			//~ writeLog("Executing last command STBD: "+lastcmd[2*n]);
+			
+		//~ if(debug) console.log("last command of bmu #"+(n+1) + ": "+str);
+		if(str=="drive")
+			$("#drive"+key).trigger("click");
+		else if(str=="stop" || str=="clearstop")
+			$("#stop"+key).trigger("click");
+		else if(str.indexOf("charge") > -1) {
+			if(str=="charge_37000")
+				execCharge("storage",key.toLowerCase());
+			else
+				execCharge("full",key.toLowerCase());
+			setBtn("charge"+key);
+		}
+		else if(str.indexOf("balance") > -1)
+			$("#balance"+key).trigger("click");
+		
+	}
+	
+	$("#flagpop1").hide();
+	$("#flagpop2").hide();
+	$("#flagpop3").hide();
+	$("#flagpop4").hide();
+
+	//start data pulling loop
+    window.setInterval( updateData, loopTime );
+});
+
+/* clock */
+function startTime() {
+    var today=new Date();
+    var h=today.getHours();
+    var m=today.getMinutes();
+    var s=today.getSeconds();
+    m = checkTimeZero(m);
+    s = checkTimeZero(s);
+    document.getElementById('clock').innerHTML = h+":"+m+":"+s;
+    var t = setTimeout(function(){startTime()},500);
+}
+//for clock display
+function checkTimeZero(i) {
+    if (i<10) {i = "0" + i};  // add zero in front of numbers < 10
+    return i;
+}
+
+</script>
+</head>
+<body onload="startTime()">
+<div id="page_container">
+	<!-- main display table container-->
+	<table border="1" class="container-table">
+		<tr style="padding: 4px;">
+			<!-- state of charge gauge -->
+			<td colspan="2">
+				<table style="width:100%;border-collapse:collapse;">
+					<tr>
+						<td style="font-size:12px;width:4%;text-align:center;"><div>PORT</div><div>SOC</div></div></td>
+						<td style="border-right:1px solid #000;width:46%;"><span id="SOC"></span></td>
+						<td style="font-size:12px;width:4%;text-align:center;"><div>STBD</div><div>SOC</div></div></td>
+						<td style="width:56%;"><span id="SOC2"></span></td>
+					</tr>
+				</table>
+			</td>
+		</tr>
+		<tr>
+			<td>
+				<div id="tabs">
+					<ul>
+						<li><a href="#tabs-1">Home</a></li>
+						<li id="t-1"><a href="#tabs-2">PORT AFT</a></li>
+						<li id="t-2"><a href="#tabs-3">PORT FWD</a></li>
+						<li id="t-3"><a href="#tabs-4">STBD AFT</a></li>
+						<li id="t-4"><a href="#tabs-5">STBD FWD</a></li>
+						<li style="float:right;background:none;border:0;vertical-align:middle;padding-right:20px;padding-top:6px;" id="clock"></li>
+					</ul>
+					<div id="tabs-1">
+						<!-- gauge table -->
+						<table class="gauge_table" border="1">
+							<tr>
+								<td style="width:50%">
+									<center>
+										<!-- PORT SIDE -->
+										<div class="main_section">
+											<div class="section_header">PORT</div>
+											<div id="PVGauge"></div>
+											<div class="gauge_val1">Voltage: <span id="VText1" style="padding-right:30px;"></span></div>
+											<div id="VText1_more" class="gauge_val2"><span style="float:left;padding:3px 20px 20px 15px;">Min Cell Voltage: <span id="minVText1"></span></span><span style="float:right;padding:3px 15px 20px 20px;">Max Cell Voltage: <span id="maxVText1"></span></span></div>
+											<div id="PPGauge"></div>
+											<div class="gauge_val1">Power: <span id="PText1">0.0 kW</span></div>
+											<div class="gauge_val2">Current: <span id="AText1">0.0 A</span></div>
+<!--
+											<div class="gauge_val2"></div>
+-->
+											<!-- port fault & info table -->
+											<table class="fault_tbl">
+												<tr>
+													<th>AFT</th>
+                                                    <th>MAINTENANCE</th>
+													<th>FWD</th>
+												</tr>
+												<tr>
+													<td><img id="portAFTLight" src="./neutral.png" height="20px" width="20px">&nbsp;AFT Fault</td>
+                                                    <td><img id="portBRLight" src="./neutral.png" height="20px" width="20px">&nbsp;<small>Balance Recommend</small></td>
+													<td><img id="portFWDLight" src="./neutral.png" height="20px" width="20px">&nbsp;FWD Fault</td>
+												</tr>
+												<tr>
+													<td>Max Temp: <span id="maxTempPAFT"></span></td>
+                                                    <td><center>
+														<button id="balancePort" class="btn btn-mini btn-info disabled" type="button" title="-Request Port voltage balancing -Mininum cell voltage must be above 3.7V">Balance</button>
+													</center></td>
+													<td>Max Temp: <span id="maxTempPFWD"></span></td>
+												</tr>
+												<tr>
+													<td>Pressure: <span id="pressPAFT"></span></td>
+                                                    <td><center>
+														<button id="chargePort" class="btn btn-mini btn-warning disabled" type="button" title="-Request Port charging">Charge</button>
+													</center></td>
+													<td>Pressure: <span id="pressPFWD"></span></td>
+												</tr>
+											</table>
+										</div>
+									</center>
+								</td>
+								<td style="width:50%;">
+									<center>
+										<!--STARBOARD SIDE -->
+										<div class="main_section">
+											<div class="section_header">STBD</div>
+											<div id="SVGauge"></div>
+											<div class="gauge_val1">Voltage: <span id="VText2" style="padding-right:30px;"></span></div>
+											<div id="VText2_more" class="gauge_val2"><span style="float:left;padding:3px 20px 20px 15px;">Min Cell Voltage: <span id="minVText2"></span></span><span style="float:right;padding:3px 15px 20px 20px;">Max Cell Voltage: <span id="maxVText2"></span></span></div>
+											<div id="SPGauge"></div>
+											<div class="gauge_val1"><span>Power: <span id="PText2">0.0 kW</span></span></div>
+											<div class="gauge_val2">Current: <span id="AText2">0.0 A</span></div>
+<!--
+											<div class="gauge_val2"></div>
+-->
+											<!-- port fault & info table -->
+											<table class="fault_tbl">
+												<tr>
+													<th>AFT</th>
+                                                    <th>MAINTENANCE</th>
+													<th>FWD</th>
+												</tr>
+												<tr>
+													<td><img id="starAFTLight" src="./neutral.png" height="20px" width="20px">&nbsp;AFT Fault</td>
+                                                    <td><img id="starBRLight" src="./neutral.png" height="20px" width="20px">&nbsp;<small>Balance Recommend</small></td>
+													<td><img id="starFWDLight" src="./neutral.png" height="20px" width="20px">&nbsp;FWD Fault</td>
+												</tr>
+												<tr>
+													<td>Max Temp: <span id="maxTempSAFT"></span></td>
+                                                    <td><center>
+														<button id="balanceStar" class="btn btn-mini btn-info disabled" type="button" title="-Request Starboard voltage balancing-Mininum cell voltage must be above 3.7V">Balance</button>
+													</center></td>
+													<td>Max Temp: <span id="maxTempSFWD"></span></td>
+												</tr>
+												<tr>
+													<td>Pressure: <span id="pressSAFT"></span></td>
+                                                    <td><center>
+														<button id="chargeStar" class="btn btn-mini btn-warning disabled" type="button" title="-Request Starboard charging">Charge</button>
+													</center></td>
+													<td>Pressure: <span id="pressSFWD"></span></td>
+												</tr>
+											</table>											
+										</div>
+									</center>
+								</td>
+							</tr>
+						</table>				
+					</div>
+					<!--string 1 tab -->
+					<div id="tabs-2">
+						<table id="bmu0" class="dataTable" border=1>
+							<tr class="tfields"> <td></td> <td>1</td> <td >2</td> <td >3</td> <td >4</td> <td >5</td> <td >6</td> <td >7</td> <td >8</td> <td >9</td> <td >10</td> <td >11</td> <td >12</td> <td >13</td> <td >14</td> </tr>
+							<tr>
+								<td class="datafield">V1</td>
+								<td class="B1V1"></td>
+								<td class="B2V1"></td>
+								<td class="B3V1"></td>
+								<td class="B4V1"></td>
+								<td class="B5V1"></td>
+								<td class="B6V1"></td>
+								<td class="B7V1"></td>
+								<td class="B8V1"></td>
+								<td class="B9V1"></td>
+								<td class="B10V1"></td>
+								<td class="B11V1"></td>
+								<td class="B12V1"></td>
+								<td class="B13V1"></td>
+								<td class="B14V1"></td>
+							</tr>
+							<tr>
+								<td class="datafield">V2</td>
+								<td class="B1V2"></td>
+								<td class="B2V2"></td>
+								<td class="B3V2"></td>
+								<td class="B4V2"></td>
+								<td class="B5V2"></td>
+								<td class="B6V2"></td>
+								<td class="B7V2"></td>
+								<td class="B8V2"></td>
+								<td class="B9V2"></td>
+								<td class="B10V2"></td>
+								<td class="B11V2"></td>
+								<td class="B12V2"></td>
+								<td class="B13V2"></td>
+								<td class="B14V2"></td>
+							</tr>
+							<tr>
+								<td class="datafield">V3</td>
+								<td class="B1V3"></td>
+								<td class="B2V3"></td>
+								<td class="B3V3"></td>
+								<td class="B4V3"></td>
+								<td class="B5V3"></td>
+								<td class="B6V3"></td>
+								<td class="B7V3"></td>
+								<td class="B8V3"></td>
+								<td class="B9V3"></td>
+								<td class="B10V3"></td>
+								<td class="B11V3"></td>
+								<td class="B12V3"></td>
+								<td class="B13V3"></td>
+								<td class="B14V3"></td>
+							</tr>
+							<tr>
+								<td class="datafield">BM SUM</td>
+								<td class="B1Vsum"></td>
+								<td class="B2Vsum"></td>
+								<td class="B3Vsum"></td>
+								<td class="B4Vsum"></td>
+								<td class="B5Vsum"></td>
+								<td class="B6Vsum"></td>
+								<td class="B7Vsum"></td>
+								<td class="B8Vsum"></td>
+								<td class="B9Vsum"></td>
+								<td class="B10Vsum"></td>
+								<td class="B11Vsum"></td>
+								<td class="B12Vsum"></td>
+								<td class="B13Vsum"></td>
+								<td class="B14Vsum"></td>
+							</tr>
+							<tr>
+								<td class="datafield">T1</td>
+								<td class="B1T1"></td>
+								<td class="B2T1"></td>
+								<td class="B3T1"></td>
+								<td class="B4T1"></td>
+								<td class="B5T1"></td>
+								<td class="B6T1"></td>
+								<td class="B7T1"></td>
+								<td class="B8T1"></td>
+								<td class="B9T1"></td>
+								<td class="B10T1"></td>
+								<td class="B11T1"></td>
+								<td class="B12T1"></td>
+								<td class="B13T1"></td>
+								<td class="B14T1"></td>
+							</tr>
+							<tr>
+								<td class="datafield">T2</td>
+								<td class="B1T2"></td>
+								<td class="B2T2"></td>
+								<td class="B3T2"></td>
+								<td class="B4T2"></td>
+								<td class="B5T2"></td>
+								<td class="B6T2"></td>
+								<td class="B7T2"></td>
+								<td class="B8T2"></td>
+								<td class="B9T2"></td>
+								<td class="B10T2"></td>
+								<td class="B11T2"></td>
+								<td class="B12T2"></td>
+								<td class="B13T2"></td>
+								<td class="B14T2"></td>
+							</tr>
+							<tr>
+								<td class="datafield">T3</td>
+								<td class="B1T3"></td>
+								<td class="B2T3"></td>
+								<td class="B3T3"></td>
+								<td class="B4T3"></td>
+								<td class="B5T3"></td>
+								<td class="B6T3"></td>
+								<td class="B7T3"></td>
+								<td class="B8T3"></td>
+								<td class="B9T3"></td>
+								<td class="B10T3"></td>
+								<td class="B11T3"></td>
+								<td class="B12T3"></td>
+								<td class="B13T3"></td>
+								<td class="B14T3"></td>
+							</tr>
+							<tr>
+								<td class="datafield">HS</td>
+								<td class="B1T4"></td>
+								<td class="B2T4"></td>
+								<td class="B3T4"></td>
+								<td class="B4T4"></td>
+								<td class="B5T4"></td>
+								<td class="B6T4"></td>
+								<td class="B7T4"></td>
+								<td class="B8T4"></td>
+								<td class="B9T4"></td>
+								<td class="B10T4"></td>
+								<td class="B11T4"></td>
+								<td class="B12T4"></td>
+								<td class="B13T4"></td>
+								<td class="B14T4"></td>
+							</tr>
+							<tr>
+								<td class="datafield">BME T</td>
+								<td class="B1TI"></td>
+								<td class="B2TI"></td>
+								<td class="B3TI"></td>
+								<td class="B4TI"></td>
+								<td class="B5TI"></td>
+								<td class="B6TI"></td>
+								<td class="B7TI"></td>
+								<td class="B8TI"></td>
+								<td class="B9TI"></td>
+								<td class="B10TI"></td>
+								<td class="B11TI"></td>
+								<td class="B12TI"></td>
+								<td class="B13TI"></td>
+								<td class="B14TI"></td>
+							</tr>
+						</table>
+						<div class="dataSummary">
+							<table>
+								<tr>
+									<td width="15%">Voltage: <span id="vbmu1"></span> V</td><td width="20%"><img id="VFlagLight1" src="./neutral.png" height="20px" width="20px">&nbsp;Voltage Flag</td><td width="20%"><img id="TFlagLight1" src="./neutral.png" height="20px" width="20px">&nbsp;Temp Flag</td><td width="20%"><img id="PRFlagLight1" src="./neutral.png" height="20px" width="20px">&nbsp;Pressure Rate Flag</td><td width="10%"></td>
+								</tr>
+								<tr>
+									<td width="15%">Current: <span id="ibmu1"></span> A</td><td width="20%"><img id="CurFlagLight1" src="./neutral.png" height="20px" width="20px">&nbsp;Current Flag</td><td width="20%"><img id="CommFlagLight1" src="./neutral.png" height="20px" width="20px">&nbsp;Communication Error</td><td width="20%"><img id="WaterFlagLight1" src="./neutral.png" height="20px" width="20px">&nbsp;Water Flag</td><td width="10%"><button id="ignore1" class="btn btn-mini" type="button">Ignore</button></td>
+								</tr>
+								<tr>
+									<td width="15%">Pressure: <span id="pbmu1"></span> GPSI</td><td width="20%"><img id="PFlagLight1" src="./neutral.png" height="20px" width="20px">&nbsp;Pressure Flag</td><td width="20%"><img id="BMEErrorFlagLight1" src="./neutral.png" height="20px" width="20px">&nbsp;BME Error</td><td width="20%"><img id="OverrideFlagLight1" src="./neutral.png" height="20px" width="20px">&nbsp;Override</td><td width="10%"><button id="reset1" class="btn btn-mini" type="button">Reset</button></td>
+								</tr>
+							</table>					
+						</div>
+					</div>
+					<!--string 2 tab -->
+					<div id="tabs-3">
+						<table id="bmu1" class="dataTable" border=1>
+							<tr class="tfields"> <td></td> <td>1</td> <td >2</td> <td >3</td> <td >4</td> <td >5</td> <td >6</td> <td >7</td> <td >8</td> <td >9</td> <td >10</td> <td >11</td> <td >12</td> <td >13</td> <td >14</td> </tr>
+							<tr>
+								<td class="datafield">V1</td>
+								<td class="B1V1"></td>
+								<td class="B2V1"></td>
+								<td class="B3V1"></td>
+								<td class="B4V1"></td>
+								<td class="B5V1"></td>
+								<td class="B6V1"></td>
+								<td class="B7V1"></td>
+								<td class="B8V1"></td>
+								<td class="B9V1"></td>
+								<td class="B10V1"></td>
+								<td class="B11V1"></td>
+								<td class="B12V1"></td>
+								<td class="B13V1"></td>
+								<td class="B14V1"></td>
+							</tr>
+							<tr>
+								<td class="datafield">V2</td>
+								<td class="B1V2"></td>
+								<td class="B2V2"></td>
+								<td class="B3V2"></td>
+								<td class="B4V2"></td>
+								<td class="B5V2"></td>
+								<td class="B6V2"></td>
+								<td class="B7V2"></td>
+								<td class="B8V2"></td>
+								<td class="B9V2"></td>
+								<td class="B10V2"></td>
+								<td class="B11V2"></td>
+								<td class="B12V2"></td>
+								<td class="B13V2"></td>
+								<td class="B14V2"></td>
+							</tr>
+							<tr>
+								<td class="datafield">V3</td>
+								<td class="B1V3"></td>
+								<td class="B2V3"></td>
+								<td class="B3V3"></td>
+								<td class="B4V3"></td>
+								<td class="B5V3"></td>
+								<td class="B6V3"></td>
+								<td class="B7V3"></td>
+								<td class="B8V3"></td>
+								<td class="B9V3"></td>
+								<td class="B10V3"></td>
+								<td class="B11V3"></td>
+								<td class="B12V3"></td>
+								<td class="B13V3"></td>
+								<td class="B14V3"></td>
+							</tr>
+							<tr>
+								<td class="datafield">BM SUM</td>
+								<td class="B1Vsum"></td>
+								<td class="B2Vsum"></td>
+								<td class="B3Vsum"></td>
+								<td class="B4Vsum"></td>
+								<td class="B5Vsum"></td>
+								<td class="B6Vsum"></td>
+								<td class="B7Vsum"></td>
+								<td class="B8Vsum"></td>
+								<td class="B9Vsum"></td>
+								<td class="B10Vsum"></td>
+								<td class="B11Vsum"></td>
+								<td class="B12Vsum"></td>
+								<td class="B13Vsum"></td>
+								<td class="B14Vsum"></td>
+							</tr>
+							<tr>
+								<td class="datafield">T1</td>
+								<td class="B1T1"></td>
+								<td class="B2T1"></td>
+								<td class="B3T1"></td>
+								<td class="B4T1"></td>
+								<td class="B5T1"></td>
+								<td class="B6T1"></td>
+								<td class="B7T1"></td>
+								<td class="B8T1"></td>
+								<td class="B9T1"></td>
+								<td class="B10T1"></td>
+								<td class="B11T1"></td>
+								<td class="B12T1"></td>
+								<td class="B13T1"></td>
+								<td class="B14T1"></td>
+							</tr>
+							<tr>
+								<td class="datafield">T2</td>
+								<td class="B1T2"></td>
+								<td class="B2T2"></td>
+								<td class="B3T2"></td>
+								<td class="B4T2"></td>
+								<td class="B5T2"></td>
+								<td class="B6T2"></td>
+								<td class="B7T2"></td>
+								<td class="B8T2"></td>
+								<td class="B9T2"></td>
+								<td class="B10T2"></td>
+								<td class="B11T2"></td>
+								<td class="B12T2"></td>
+								<td class="B13T2"></td>
+								<td class="B14T2"></td>
+							</tr>
+							<tr>
+								<td class="datafield">T3</td>
+								<td class="B1T3"></td>
+								<td class="B2T3"></td>
+								<td class="B3T3"></td>
+								<td class="B4T3"></td>
+								<td class="B5T3"></td>
+								<td class="B6T3"></td>
+								<td class="B7T3"></td>
+								<td class="B8T3"></td>
+								<td class="B9T3"></td>
+								<td class="B10T3"></td>
+								<td class="B11T3"></td>
+								<td class="B12T3"></td>
+								<td class="B13T3"></td>
+								<td class="B14T3"></td>
+							</tr>
+							<tr>
+								<td class="datafield">HS</td>
+								<td class="B1T4"></td>
+								<td class="B2T4"></td>
+								<td class="B3T4"></td>
+								<td class="B4T4"></td>
+								<td class="B5T4"></td>
+								<td class="B6T4"></td>
+								<td class="B7T4"></td>
+								<td class="B8T4"></td>
+								<td class="B9T4"></td>
+								<td class="B10T4"></td>
+								<td class="B11T4"></td>
+								<td class="B12T4"></td>
+								<td class="B13T4"></td>
+								<td class="B14T4"></td>
+							</tr>
+							<tr>
+								<td class="datafield">BME T</td>
+								<td class="B1TI"></td>
+								<td class="B2TI"></td>
+								<td class="B3TI"></td>
+								<td class="B4TI"></td>
+								<td class="B5TI"></td>
+								<td class="B6TI"></td>
+								<td class="B7TI"></td>
+								<td class="B8TI"></td>
+								<td class="B9TI"></td>
+								<td class="B10TI"></td>
+								<td class="B11TI"></td>
+								<td class="B12TI"></td>
+								<td class="B13TI"></td>
+								<td class="B14TI"></td>
+							</tr>
+						</table>
+						<div class="dataSummary">
+							<table>
+								<tr>
+									<td width="15%">Voltage: <span id="vbmu2"></span> V</td><td width="20%"><img id="VFlagLight2" src="./neutral.png" height="20px" width="20px">&nbsp;Voltage Flag</td><td width="20%"><img id="TFlagLight2" src="./neutral.png" height="20px" width="20px">&nbsp;Temp Flag</td><td width="20%"><img id="PRFlagLight2" src="./neutral.png" height="20px" width="20px">&nbsp;Pressure Rate Flag</td><td width="10%"></td>
+								</tr>
+								<tr>
+									<td width="15%">Current: <span id="ibmu2"></span> A</td><td width="20%"><img id="CurFlagLight2" src="./neutral.png" height="20px" width="20px">&nbsp;Current Flag</td><td width="20%"><img id="CommFlagLight2" src="./neutral.png" height="20px" width="20px">&nbsp;Communication Error</td><td width="20%"><img id="WaterFlagLight2" src="./neutral.png" height="20px" width="20px">&nbsp;Water Flag</td><td width="10%"><button id="ignore2" class="btn btn-mini" type="button">Ignore</button></td>
+								</tr>
+								<tr>
+									<td width="15%">Pressure: <span id="pbmu2"></span> GPSI</td><td width="20%"><img id="PFlagLight2" src="./neutral.png" height="20px" width="20px">&nbsp;Pressure Flag</td><td width="20%"><img id="BMEErrorFlagLight2" src="./neutral.png" height="20px" width="20px">&nbsp;BME Error</td><td width="20%"><img id="OverrideFlagLight2" src="./neutral.png" height="20px" width="20px">&nbsp;Override</td><td width="10%"><button id="reset2" class="btn btn-mini" type="button">Reset</button></td>
+								</tr>
+							</table>
+						</div>					
+					</div>
+					<!-- string 3 tab -->
+					<div id="tabs-4">
+						<table id="bmu2" class="dataTable" border=1>
+							<tr class="tfields"> <td></td> <td>1</td> <td >2</td> <td >3</td> <td >4</td> <td >5</td> <td >6</td> <td >7</td> <td >8</td> <td >9</td> <td >10</td> <td >11</td> <td >12</td> <td >13</td> <td >14</td> </tr>
+							<tr>
+								<td class="datafield">V1</td>
+								<td class="B1V1"></td>
+								<td class="B2V1"></td>
+								<td class="B3V1"></td>
+								<td class="B4V1"></td>
+								<td class="B5V1"></td>
+								<td class="B6V1"></td>
+								<td class="B7V1"></td>
+								<td class="B8V1"></td>
+								<td class="B9V1"></td>
+								<td class="B10V1"></td>
+								<td class="B11V1"></td>
+								<td class="B12V1"></td>
+								<td class="B13V1"></td>
+								<td class="B14V1"></td>
+							</tr>
+							<tr>
+								<td class="datafield">V2</td>
+								<td class="B1V2"></td>
+								<td class="B2V2"></td>
+								<td class="B3V2"></td>
+								<td class="B4V2"></td>
+								<td class="B5V2"></td>
+								<td class="B6V2"></td>
+								<td class="B7V2"></td>
+								<td class="B8V2"></td>
+								<td class="B9V2"></td>
+								<td class="B10V2"></td>
+								<td class="B11V2"></td>
+								<td class="B12V2"></td>
+								<td class="B13V2"></td>
+								<td class="B14V2"></td>
+							</tr>
+							<tr>
+								<td class="datafield">V3</td>
+								<td class="B1V3"></td>
+								<td class="B2V3"></td>
+								<td class="B3V3"></td>
+								<td class="B4V3"></td>
+								<td class="B5V3"></td>
+								<td class="B6V3"></td>
+								<td class="B7V3"></td>
+								<td class="B8V3"></td>
+								<td class="B9V3"></td>
+								<td class="B10V3"></td>
+								<td class="B11V3"></td>
+								<td class="B12V3"></td>
+								<td class="B13V3"></td>
+								<td class="B14V3"></td>
+							</tr>
+							<tr>
+								<td class="datafield">BM SUM</td>
+								<td class="B1Vsum"></td>
+								<td class="B2Vsum"></td>
+								<td class="B3Vsum"></td>
+								<td class="B4Vsum"></td>
+								<td class="B5Vsum"></td>
+								<td class="B6Vsum"></td>
+								<td class="B7Vsum"></td>
+								<td class="B8Vsum"></td>
+								<td class="B9Vsum"></td>
+								<td class="B10Vsum"></td>
+								<td class="B11Vsum"></td>
+								<td class="B12Vsum"></td>
+								<td class="B13Vsum"></td>
+								<td class="B14Vsum"></td>
+							 </tr>
+							<tr>
+								<td class="datafield">T1</td>
+								<td class="B1T1"></td>
+								<td class="B2T1"></td>
+								<td class="B3T1"></td>
+								<td class="B4T1"></td>
+								<td class="B5T1"></td>
+								<td class="B6T1"></td>
+								<td class="B7T1"></td>
+								<td class="B8T1"></td>
+								<td class="B9T1"></td>
+								<td class="B10T1"></td>
+								<td class="B11T1"></td>
+								<td class="B12T1"></td>
+								<td class="B13T1"></td>
+								<td class="B14T1"></td>
+							</tr>
+							<tr>
+								<td class="datafield">T2</td>
+								<td class="B1T2"></td>
+								<td class="B2T2"></td>
+								<td class="B3T2"></td>
+								<td class="B4T2"></td>
+								<td class="B5T2"></td>
+								<td class="B6T2"></td>
+								<td class="B7T2"></td>
+								<td class="B8T2"></td>
+								<td class="B9T2"></td>
+								<td class="B10T2"></td>
+								<td class="B11T2"></td>
+								<td class="B12T2"></td>
+								<td class="B13T2"></td>
+								<td class="B14T2"></td>
+							</tr>
+							<tr>
+								<td class="datafield">T3</td>
+								<td class="B1T3"></td>
+								<td class="B2T3"></td>
+								<td class="B3T3"></td>
+								<td class="B4T3"></td>
+								<td class="B5T3"></td>
+								<td class="B6T3"></td>
+								<td class="B7T3"></td>
+								<td class="B8T3"></td>
+								<td class="B9T3"></td>
+								<td class="B10T3"></td>
+								<td class="B11T3"></td>
+								<td class="B12T3"></td>
+								<td class="B13T3"></td>
+								<td class="B14T3"></td>
+							</tr>
+							<tr>
+								<td class="datafield">HS</td>
+								<td class="B1T4"></td>
+								<td class="B2T4"></td>
+								<td class="B3T4"></td>
+								<td class="B4T4"></td>
+								<td class="B5T4"></td>
+								<td class="B6T4"></td>
+								<td class="B7T4"></td>
+								<td class="B8T4"></td>
+								<td class="B9T4"></td>
+								<td class="B10T4"></td>
+								<td class="B11T4"></td>
+								<td class="B12T4"></td>
+								<td class="B13T4"></td>
+								<td class="B14T4"></td>
+							</tr>
+							<tr>
+								<td class="datafield">BME T</td>
+								<td class="B1TI"></td>
+								<td class="B2TI"></td>
+								<td class="B3TI"></td>
+								<td class="B4TI"></td>
+								<td class="B5TI"></td>
+								<td class="B6TI"></td>
+								<td class="B7TI"></td>
+								<td class="B8TI"></td>
+								<td class="B9TI"></td>
+								<td class="B10TI"></td>
+								<td class="B11TI"></td>
+								<td class="B12TI"></td>
+								<td class="B13TI"></td>
+								<td class="B14TI"></td>
+							</tr>
+						</table>
+						<div class="dataSummary">
+							<table>
+								<tr>
+									<td width="15%">Voltage: <span id="vbmu3"></span> V</td><td width="20%"><img id="VFlagLight3" src="./neutral.png" height="20px" width="20px">&nbsp;Voltage Flag</td><td width="20%"><img id="TFlagLight3" src="./neutral.png" height="20px" width="20px">&nbsp;Temp Flag</td><td width="20%"><img id="PRFlagLight3" src="./neutral.png" height="20px" width="20px">&nbsp;Pressure Rate Flag</td><td width="10%"></td>
+								</tr>
+								<tr>
+									<td width="15%">Current: <span id="ibmu3"></span> A</td><td width="20%"><img id="CurFlagLight3" src="./neutral.png" height="20px" width="20px">&nbsp;Current Flag</td><td width="20%"><img id="CommFlagLight3" src="./neutral.png" height="20px" width="20px">&nbsp;Communication Error</td><td width="20%"><img id="WaterFlagLight3" src="./neutral.png" height="20px" width="20px">&nbsp;Water Flag</td><td width="10%"><button id="ignore3" class="btn btn-mini" type="button">Ignore</button></td>
+								</tr>
+								<tr>
+									<td width="15%">Pressure: <span id="pbmu3"></span> GPSI</td><td width="20%"><img id="PFlagLight3" src="./neutral.png" height="20px" width="20px">&nbsp;Pressure Flag</td><td width="20%"><img id="BMEErrorFlagLight3" src="./neutral.png" height="20px" width="20px">&nbsp;BME Error</td><td width="20%"><img id="OverrideFlagLight3" src="./neutral.png" height="20px" width="20px">&nbsp;Override</td><td width="10%"><button id="reset3" class="btn btn-mini" type="button">Reset</button></td>
+								</tr>
+							</table>
+						</div>					
+					</div>
+					<!-- string 4 tab -->
+					<div id="tabs-5">
+						<table id="bmu3" class="dataTable" border=1>
+							<tr class="tfields"> <td></td> <td>1</td> <td >2</td> <td >3</td> <td >4</td> <td >5</td> <td >6</td> <td >7</td> <td >8</td> <td >9</td> <td >10</td> <td >11</td> <td >12</td> <td >13</td> <td >14</td> </tr>
+							<tr>
+								<td class="datafield">V1</td>
+								<td class="B1V1"></td>
+								<td class="B2V1"></td>
+								<td class="B3V1"></td>
+								<td class="B4V1"></td>
+								<td class="B5V1"></td>
+								<td class="B6V1"></td>
+								<td class="B7V1"></td>
+								<td class="B8V1"></td>
+								<td class="B9V1"></td>
+								<td class="B10V1"></td>
+								<td class="B11V1"></td>
+								<td class="B12V1"></td>
+								<td class="B13V1"></td>
+								<td class="B14V1"></td>
+							</tr>
+							<tr>
+								<td class="datafield">V2</td>
+								<td class="B1V2"></td>
+								<td class="B2V2"></td>
+								<td class="B3V2"></td>
+								<td class="B4V2"></td>
+								<td class="B5V2"></td>
+								<td class="B6V2"></td>
+								<td class="B7V2"></td>
+								<td class="B8V2"></td>
+								<td class="B9V2"></td>
+								<td class="B10V2"></td>
+								<td class="B11V2"></td>
+								<td class="B12V2"></td>
+								<td class="B13V2"></td>
+								<td class="B14V2"></td>
+							</tr>
+							<tr>
+								<td class="datafield">V3</td>
+								<td class="B1V3"></td>
+								<td class="B2V3"></td>
+								<td class="B3V3"></td>
+								<td class="B4V3"></td>
+								<td class="B5V3"></td>
+								<td class="B6V3"></td>
+								<td class="B7V3"></td>
+								<td class="B8V3"></td>
+								<td class="B9V3"></td>
+								<td class="B10V3"></td>
+								<td class="B11V3"></td>
+								<td class="B12V3"></td>
+								<td class="B13V3"></td>
+								<td class="B14V3"></td>
+							</tr>
+							<tr>
+								<td class="datafield">BM SUM</td>
+								<td class="B1Vsum"></td>
+								<td class="B2Vsum"></td>
+								<td class="B3Vsum"></td>
+								<td class="B4Vsum"></td>
+								<td class="B5Vsum"></td>
+								<td class="B6Vsum"></td>
+								<td class="B7Vsum"></td>
+								<td class="B8Vsum"></td>
+								<td class="B9Vsum"></td>
+								<td class="B10Vsum"></td>
+								<td class="B11Vsum"></td>
+								<td class="B12Vsum"></td>
+								<td class="B13Vsum"></td>
+								<td class="B14Vsum"></td>
+							</tr>
+							<tr>
+								<td class="datafield">T1</td>
+								<td class="B1T1"></td>
+								<td class="B2T1"></td>
+								<td class="B3T1"></td>
+								<td class="B4T1"></td>
+								<td class="B5T1"></td>
+								<td class="B6T1"></td>
+								<td class="B7T1"></td>
+								<td class="B8T1"></td>
+								<td class="B9T1"></td>
+								<td class="B10T1"></td>
+								<td class="B11T1"></td>
+								<td class="B12T1"></td>
+								<td class="B13T1"></td>
+								<td class="B14T1"></td>
+							</tr>
+							<tr>
+								<td class="datafield">T2</td>
+								<td class="B1T2"></td>
+								<td class="B2T2"></td>
+								<td class="B3T2"></td>
+								<td class="B4T2"></td>
+								<td class="B5T2"></td>
+								<td class="B6T2"></td>
+								<td class="B7T2"></td>
+								<td class="B8T2"></td>
+								<td class="B9T2"></td>
+								<td class="B10T2"></td>
+								<td class="B11T2"></td>
+								<td class="B12T2"></td>
+								<td class="B13T2"></td>
+								<td class="B14T2"></td>
+							</tr>
+							<tr>
+								<td class="datafield">T3</td>
+								<td class="B1T3"></td>
+								<td class="B2T3"></td>
+								<td class="B3T3"></td>
+								<td class="B4T3"></td>
+								<td class="B5T3"></td>
+								<td class="B6T3"></td>
+								<td class="B7T3"></td>
+								<td class="B8T3"></td>
+								<td class="B9T3"></td>
+								<td class="B10T3"></td>
+								<td class="B11T3"></td>
+								<td class="B12T3"></td>
+								<td class="B13T3"></td>
+								<td class="B14T3"></td>
+							</tr>
+							<tr>
+								<td class="datafield">HS</td>
+								<td class="B1T4"></td>
+								<td class="B2T4"></td>
+								<td class="B3T4"></td>
+								<td class="B4T4"></td>
+								<td class="B5T4"></td>
+								<td class="B6T4"></td>
+								<td class="B7T4"></td>
+								<td class="B8T4"></td>
+								<td class="B9T4"></td>
+								<td class="B10T4"></td>
+								<td class="B11T4"></td>
+								<td class="B12T4"></td>
+								<td class="B13T4"></td>
+								<td class="B14T4"></td>
+							</tr>
+							<tr>
+								<td class="datafield">BME T</td>
+								<td class="B1TI"></td>
+								<td class="B2TI"></td>
+								<td class="B3TI"></td>
+								<td class="B4TI"></td>
+								<td class="B5TI"></td>
+								<td class="B6TI"></td>
+								<td class="B7TI"></td>
+								<td class="B8TI"></td>
+								<td class="B9TI"></td>
+								<td class="B10TI"></td>
+								<td class="B11TI"></td>
+								<td class="B12TI"></td>
+								<td class="B13TI"></td>
+								<td class="B14TI"></td>
+							</tr>
+						</table>
+						<div class="dataSummary">
+							<table>
+								<tr>
+									<td width="15%">Voltage: <span id="vbmu4"></span> V</td><td width="20%"><img id="VFlagLight4" src="./neutral.png" height="20px" width="20px">&nbsp;Voltage Flag</td><td width="20%"><img id="TFlagLight4" src="./neutral.png" height="20px" width="20px">&nbsp;Temp Flag</td><td width="20%"><img id="PRFlagLight4" src="./neutral.png" height="20px" width="20px">&nbsp;Pressure Rate Flag</td><td width="10%"></td>
+								</tr>
+								<tr>
+									<td width="15%">Current: <span id="ibmu4"></span> A</td><td width="20%"><img id="CurFlagLight4" src="./neutral.png" height="20px" width="20px">&nbsp;Current Flag</td><td width="20%"><img id="CommFlagLight4" src="./neutral.png" height="20px" width="20px">&nbsp;Communication Error</td><td width="20%"><img id="WaterFlagLight4" src="./neutral.png" height="20px" width="20px">&nbsp;Water Flag</td><td width="10%"><button id="ignore4" class="btn btn-mini" type="button">Ignore</button></td>
+								</tr>
+								<tr>
+									<td width="15%">Pressure: <span id="pbmu4"></span> GPSI</td><td width="20%"><img id="PFlagLight4" src="./neutral.png" height="20px" width="20px">&nbsp;Pressure Flag</td><td width="20%"><img id="BMEErrorFlagLight4" src="./neutral.png" height="20px" width="20px">&nbsp;BME Error</td><td width="20%"><img id="OverrideFlagLight4" src="./neutral.png" height="20px" width="20px">&nbsp;Override</td><td width="10%"><button id="reset4" class="btn btn-mini" type="button">Reset</button></td>
+								</tr>
+							</table>
+						</div>							
+					</div>
+					<!-- end of tabs half-string tables -->						
+				</div>
+				<!-- end div id="tabs" -->
+			</td>
+		</tr>
+		<tr>
+			<td><!-- port/starboard on and off buttons -->
+				<table class="gauge_table" border="1">
+					<tr>
+						<td style="width:50%">
+							<center>
+								<button id="drivePort" class="btn btn-large btn-success disabled" type="button" title="-Request Port String enter ON MODE">PORT ON</button>
+								<button id="stopPort" class="btn btn-large btn-danger disabled" type="button" title="-Request Port String enter OFF MODE-Resets flags">PORT OFF</button>
+							</center>
+						</td>
+						<td style="width:50%">
+							<center>
+								<button id="driveStar" class="btn btn-large btn-success disabled" type="button" title="-Request Starboard String enter ON MODE">STBD ON</button>
+								<button id="stopStar" class="btn btn-large btn-danger disabled" type="button" title="-Request Starboard String enter OFF MODE-Resets flags">STBD OFF</button>
+							</center>
+						</td>
+					</tr>
+				</table>
+			</td>
+			<!-- end large buttons -->
+		</tr>
+		<tr><!-- bottom text log -->
+			<td colspan="2">
+				<div id="textlog" style="height:110px;padding-left:10px;overflow:auto;"></div>
+			</td>
+		</tr>
+	</table>
+	<!-- end main display table container-->
+
+	<!-- flag popup -->
+	<div id="flagpop1" title="PORT AFT Flag">
+		&nbsp;
+	</div>
+	<div id="flagpop2" title="PORT FWD Flag">
+		&nbsp;
+	</div>
+	<div id="flagpop3" title="STAR AFT Flag">
+		&nbsp;
+	</div>
+	<div id="flagpop4" title="STAR FWD Flag">
+		&nbsp;
+	</div>
+	<div id="charge-select-port" title="Select Charge Type"></div>
+	<div id="charge-select-star" title="Select Charge Type"></div>
+</div>
+<!-- end page_container -->
+</body>
+</html>
