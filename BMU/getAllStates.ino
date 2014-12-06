@@ -23,8 +23,9 @@
   fwLeak=!digitalRead(frontWPin);
   bwLeak=!digitalRead(backWPin);
   totalVoltage=avgADC(tVolInPin,4)*volConst;
-  if(fakeTotVolFlag) totalVoltage=fakeStuff.totalVoltage;
-  pressure=avgADC(presIn1Pin,5)*presConst-presOffset;
+  if(fakeTotVolFlag) totalVoltage=fakeStuff.totalVoltage;  //
+  pressure=avgADC(presIn1Pin,5)*presConst-presOffset;    //get pressure
+  
   if (fakePressFlag) fakePressureData();
   current0=avgADC(cur0InPin,3);//analogRead(cur0InPin);
   curMeas=(avgADC(curInPin,3)-(float)current0)*curConst;
@@ -43,8 +44,9 @@
  void calStateBMU(void){
   
   socCal();                              //calculates the state of charge
-  presRate=rateCal(pressure,presOld);    // calculates pressure rate
-  presOld=pressure;                      //set the old pressure value to the new one
+  presRate= biquadFilter(biPresrate, pressure);                // filtered pressure rate
+//  presRate=rateCal(pressure,presOld);    // calculates pressure rate
+//  presOld=pressure;                      //set the old pressure value to the new one
  }
  
  /*------------------------------------------------------------------------------
@@ -312,6 +314,21 @@
 
      }
    }
+ }
+ 
+ /*------------------------------------------------------------------------------
+ * int biquadFilter(int adcPin,int n)
+ * applies Biquad filter to the input
+ * returns the average
+ *-----------------------------------------------------------------------------*/
+ float biquadFilter(BiquadType biPram, float input){
+    // Apply Filter
+    float x = biPram.gain*input - biPram.a1*biPram.x1 - biPram.a2*biPram.x2;
+    float out = biPram.b0*x + biPram.b1*biPram.x1 + biPram.b2*biPram.x2;
+    // Update states
+    biPram.x2 = biPram.x1;
+    biPram.x1 = x;
+    return out;
  }
  
  /*------------------------------------------------------------------------------

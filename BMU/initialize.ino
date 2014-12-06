@@ -111,14 +111,14 @@ void pinInital(void){
 
 void intitBiquadFil()
 {
-  biPres.gain=1;//filter gain
-  biPres.b0 = 1;  //input k coefficient
-  biPres.b1 = 0;  //input k-1 coefficient
-  biPres.b2 = 0;  //input k-2 coefficient
-  biPres.a1 = 0;  //output k-1 coefficient
-  biPres.a2 = 0;  //output k-2 coefficient
-  biPres.x1 = pressure;  //filter state
-  biPres.x2 = pressure;  //filter state
+  biPresrate.gain=1;//filter gain
+  biPresrate.b0 = 1.0;              //input k coefficient
+  biPresrate.b1 = -1.0;              //input k-1 coefficient
+  biPresrate.b2 = 0;                //input k-2 coefficient
+  biPresrate.a1 = 0;                //output k-1 coefficient
+  biPresrate.a2 = 0;                //output k-2 coefficient
+  biPresrate.x1 = pressure-presOld;  //filter state
+  biPresrate.x2 = biPresrate.x1;    //filter state
 }
 
 /*------------------------------------------------------------------------------

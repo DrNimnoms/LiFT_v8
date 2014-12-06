@@ -214,7 +214,7 @@ typedef struct{
   float x2;  //filter state
 }BiquadType;
 
-BiquadType biPres;
+BiquadType biPresrate;
 
 //BMU modes flags
 //boolean stopOn=true;
