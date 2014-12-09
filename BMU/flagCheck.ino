@@ -351,28 +351,28 @@ void volCheck(void){
  *----------------------------------------------------------------------------*/
  void clearFlags(void){
    if(uartPrint)Serial.println("inside of clearFlags()");
-   flagBMU=0;
-   flagPriority=0;
-   stopUntil=false; 
-   fanOn= false;
-   flagOverride=0;
-   chargeDoneFlag=false;
-   balDoneFlag=false;
-   leakFlag=false;
+   flagBMU = 0;
+   flagPriority = 0;
+   stopUntil = false; 
+   fanOn = false;
+   flagOverride = 0;
+   chargeDoneFlag = false;
+   balDoneFlag = false;
+   leakFlag = false;
    //debug stuff
-   fakeVolFlag=false;
-   fakePressFlag=false;
-   fakeTempFlag=false;
-   fakeTotVolFlag=false;
-   fakeModVolFlag=false;
-   fakeCurFlag=false;
-   selfTestFlag =false;
-   for(int j;j<BMENum;j++){                // goes through all BMEs
-     BME[j].ignoreiT=false;
-     for (int i=0;i<4;i++){
-       BME[j].ignoreT[i]=false;
-       BME[j].uFlag[i]=false;
-       BME[j].oFlag[i]=false;
+   fakeVolFlag = false;
+   fakePressFlag = false;
+   fakeTempFlag = false;
+   fakeTotVolFlag = false;
+   fakeModVolFlag = false;
+   fakeCurFlag = false;
+   selfTestFlag = false;
+   for(int j; j < BMENum; j++){                // goes through all BMEs
+     BME[j].ignoreiT = false;
+     for (int i = 0; i < 4; i++){
+       BME[j].ignoreT[i] = false;
+       BME[j].uFlag[i] = false;
+       BME[j].oFlag[i] = false;
      }
    }
  }

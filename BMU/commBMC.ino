@@ -1,4 +1,4 @@
-/*------------------------------------------------------------------------------
+ /*------------------------------------------------------------------------------
  * void BMCcomm(void)
  * Sends Battery information and receives commands over ethernet
  * data out: dt, SOC, total voltage, BME voltages, and BME temperatures

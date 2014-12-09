@@ -111,12 +111,14 @@ void pinInital(void){
 
 void intitBiquadFil()
 {
+  // [b, a] = butter(2,.175*2/5) in Matlab
+  // second order butterworthcutoff freq at 0.175 normalized nyquist freq, sampling 5hz
   biPresrate.gain=1;//filter gain
-  biPresrate.b0 = 1.0;              //input k coefficient
-  biPresrate.b1 = -1.0;              //input k-1 coefficient
-  biPresrate.b2 = 0;                //input k-2 coefficient
-  biPresrate.a1 = 0;                //output k-1 coefficient
-  biPresrate.a2 = 0;                //output k-2 coefficient
+  biPresrate.b0 = 0.0104;              //input k coefficient
+  biPresrate.b1 = 0.0209;              //input k-1 coefficient
+  biPresrate.b2 = 0.0104;                //input k-2 coefficient
+  biPresrate.a1 = -1.6910;                //output k-1 coefficient
+  biPresrate.a2 = 0.7327;                //output k-2 coefficient
   biPresrate.x1 = pressure-presOld;  //filter state
   biPresrate.x2 = biPresrate.x1;    //filter state
 }

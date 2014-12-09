@@ -41,8 +41,8 @@
 //BMU ADC conversion constants
   #define curConst 0.08587        //80/V*3.3V/4095*4.01ohm/3.01ohm  sensor resolution*adc resolution*voltage divider
   #define volConst 0.0482  //.0439    //(174Kohm+10Kohm)/10Kohm*(10kohm+5.1kohm)/5.1kohm*3.3V/4095
-  #define presConst 0.0061034   //1 kpa/5V/0.018*4.7ohm/3.2ohm*3.3V/4095*0.14503 gpsi/kpa
-  #define presOffset 0.0058016     //0.04 kpa 0.14503 gpsi/kpa
+  #define presConst 0.0019073   //1 kpa/5V/0.018*4.7ohm/3.2ohm*3.3V/4095*0.14503 gpsi/kpa
+  #define presOffset 0.3223     //0.04 kpa 0.14503 gpsi/kpa
   #define capConst 0.0000555556    //0.2 sec==>.000055556 hours
 
 // BMU battery prameters
@@ -108,66 +108,66 @@
   
   
  // loop timing variables
- const long controlTime=200000;  // loop time in uSec  .2 s loops ==> 5Hz
- const float dt=controlTime/1000000.0;  // control time in sec
- unsigned long timeStamp=0;          // used to keep track of the loop time
- unsigned long balanceTimeStamp=0;  // keeps track of balancing timing
- unsigned long bmcComTimeStamp=0;   // keeps track of time since last communication
- const long balanceRelaxTime= TWOMINUTES; // length of time balance mode must wait before discharging 
- const long balanceCheckTime=THIRTYSECONDS; // 
- long dLoopTime=0;         //actual loop time in usec
- int BMCcommdt=0;          // the time between bmc communications
- unsigned long overrideTimeStamp=0;
+ const long controlTime = 200000;  // loop time in uSec  .2 s loops ==> 5Hz
+ const float dt = controlTime/1000000.0;  // control time in sec
+ unsigned long timeStamp = 0;          // used to keep track of the loop time
+ unsigned long balanceTimeStamp = 0;  // keeps track of balancing timing
+ unsigned long bmcComTimeStamp = 0;   // keeps track of time since last communication
+ const long balanceRelaxTime = TWOMINUTES; // length of time balance mode must wait before discharging 
+ const long balanceCheckTime = THIRTYSECONDS; // 
+ long dLoopTime = 0;         //actual loop time in usec
+ int BMCcommdt = 0;          // the time between bmc communications
+ unsigned long overrideTimeStamp = 0;
  
 // Arduino due pins in use 
   const int tVolInPin = A3;  // Analog input pin for the total voltage
   const int presIn1Pin = A1;  // Analog pressure sensor pin
   const int curInPin = A4;  // Analog current sensor pin
-  const int cur0InPin=A7;   // current sencor referance pin
+  const int cur0InPin = A7;   // current sencor referance pin
   const int relay1 = 47;   // negative side relay or relay 1 pin
   const int relay2 = 49;   // positive side relay or realy 2 pin 
   const int frontWPin = 22;  //front water leak sensor
   const int backWPin = 23;    // back water leak sensor
 // BMU varibles
-String BMCcommand="stop";      //The command from BMC
-int conOnTime=0;          // counter to enable contactor
-boolean contactorsOn=false;
+String BMCcommand = "stop";      //The command from BMC
+int conOnTime = 0;          // counter to enable contactor
+boolean contactorsOn = false;
 
 // BMU measurement Variables
-float totalVoltage =0;        // total half-string voltage read from ADC
-float tVolOld =0;          // the last total voltage
-float pressure =0;        // pressure sensor reading
-float presOld =0;              // last pressure value
-float presRate =0;          // filtered pressure rate
-int current0 =0;         // current mid point
-float current =0;        // value read from the LEM sensor
-float currentOffset =0;  // current offset
-float curMeas =0;        // measured current
-boolean fwLeak =0;         // front leak sensor
-boolean bwLeak =0;         // back leak sensor
-int fwLeakCount=0;
-int bwLeakCount=0;
-int mismatchCount=0;
+float totalVoltage = 0;        // total half-string voltage read from ADC
+float tVolOld = 0;          // the last total voltage
+float pressure = 0;        // pressure sensor reading
+float presOld = 0;              // last pressure value
+float presRate = 0;          // filtered pressure rate
+int current0 = 0;         // current mid point
+float current = 0;        // value read from the LEM sensor
+float currentOffset = 0;  // current offset
+float curMeas = 0;        // measured current
+boolean fwLeak = 0;         // front leak sensor
+boolean bwLeak = 0;         // back leak sensor
+int fwLeakCount = 0;
+int bwLeakCount = 0;
+int mismatchCount = 0;
 
 // BMU calculated Variables
-float cap=435;            // battery capacity in Amp hours
-const float capMax=435;  
-float volSum=0.0;          // calculated sum of all virtual cells
-float SOC=50;             // percent 0-100 state of charge
-float maxTemp=0;          //  max temperature of all virtual cells
-float minVol=7.0;        //  minimum voltage of virtual cells?
-float maxVol=0.0;          // maximum voltage of virtual cells?
-float balance2Vol=4.2;    // voltage to balance to
-float balanceMax=4.2;
-int balDoneCount=0;
-float charge2Vol=3.0;      //voltage to charge to
+float cap = 435;            // battery capacity in Amp hours
+const float capMax = 435;  
+float volSum = 0.0;          // calculated sum of all virtual cells
+float SOC = 50;             // percent 0-100 state of charge
+float maxTemp = 0;          //  max temperature of all virtual cells
+float minVol = 7.0;        //  minimum voltage of virtual cells?
+float maxVol = 0.0;          // maximum voltage of virtual cells?
+float balance2Vol = 4.2;    // voltage to balance to
+float balanceMax = 4.2;
+int balDoneCount = 0;
+float charge2Vol = 3.0;      //voltage to charge to
 
 
 // BME communication PEC (packet error code) check table
 int pec15Table[256];
-int CRC15poly=0x4599;
-int selfCheckVal1=0x9555;
-int selfCheckVal2=0x6AAA;
+int CRC15poly = 0x4599;
+int selfCheckVal1 = 0x9555;
+int selfCheckVal2 = 0x6AAA;
 
 // BME varibles
 typedef struct  {
@@ -221,49 +221,49 @@ BiquadType biPresrate;
 //boolean driveOn=false;
 //boolean chargeOn=false;
 //boolean balanceOn=false;
-boolean stopUntil=false;      // true until the oprator has acknoladged the software stop
+boolean stopUntil = false;      // true until the oprator has acknoladged the software stop
 
 //BMU flags
-unsigned int flagBMU=0;         //all the BMU flags up to 32 flags
-unsigned int flagOverride=0;         //the flags that the BMC wants to override
-boolean flagIgnoreTemp=false;
-byte flagPriority=0;             //the Priority of the active flag under the current mode
+unsigned int flagBMU = 0;         //all the BMU flags up to 32 flags
+unsigned int flagOverride = 0;         //the flags that the BMC wants to override
+boolean flagIgnoreTemp = false;
+byte flagPriority = 0;             //the Priority of the active flag under the current mode
 
-boolean leakFlag =false;         //Leak in front or back of battery bottle
+boolean leakFlag = false;         //Leak in front or back of battery bottle
 
-boolean tempAlarmFlag =false;    //Any VC temp > 60 C, Heat Sink temp > 120 C, Internal chip temp>75 C
-boolean tempWarnFlag =false;     //Any VC temp > 40 C, Heat Sink temp > 110 C, Internal chip temp>65 C
-boolean tempFailFlag =false;     //Any defective/failed temperature sensor reading, when sensor disconnected or shorted out
+boolean tempAlarmFlag = false;    //Any VC temp > 60 C, Heat Sink temp > 120 C, Internal chip temp>75 C
+boolean tempWarnFlag = false;     //Any VC temp > 40 C, Heat Sink temp > 110 C, Internal chip temp>65 C
+boolean tempFailFlag = false;     //Any defective/failed temperature sensor reading, when sensor disconnected or shorted out
 
-boolean presRateFlag =false;     //Pressure rate > 1 PSI/sec
-boolean presFlag =false;        // Pressure < 1.5 PSI or Pressure  > 2.5 PSI
+boolean presRateFlag = false;     //Pressure rate > 1 PSI/sec
+boolean presFlag = false;        // Pressure < 1.5 PSI or Pressure  > 2.5 PSI
 
-boolean volHighAlarmFlag =false;      //Any VC voltage > 4.25 V 
-boolean volLowBalAlarmFlag=false;    //Any VC voltage < 3.7 V
-boolean volLowWarnFlag =false;     //Any VC voltage < 3.2 V
-boolean volLowAlarmFlag =false;    //Any VC voltage < 3.0 V
-boolean deadBatAlarmFlag=false;    //Any VC voltage < 2.5 V
-boolean volFailFlag =false;      //Any VC voltage < .1 V or >6.5 or Vref2<2.978 or>3.020
-boolean volMisFlag =false;      /*5V difference between overall half-string voltage and sum of half-string VC voltages or
+boolean volHighAlarmFlag = false;      //Any VC voltage > 4.25 V 
+boolean volLowBalAlarmFlag = false;    //Any VC voltage < 3.7 V
+boolean volLowWarnFlag = false;     //Any VC voltage < 3.2 V
+boolean volLowAlarmFlag = false;    //Any VC voltage < 3.0 V
+boolean deadBatAlarmFlag = false;    //Any VC voltage < 2.5 V
+boolean volFailFlag = false;      //Any VC voltage < .1 V or >6.5 or Vref2<2.978 or>3.020
+boolean volMisFlag = false;      /*5V difference between overall half-string voltage and sum of half-string VC voltages or
                                      50mV difference between battery module voltage and sum of its VC voltages*/
-boolean selfTestFlag =false;     // self-check failures are sent from BME                                
-boolean bmeAlarmFlag =false;     // If any cell over/under voltage failures or self-check failures are sent from BME 
-boolean bmeComFlag =false;       // Communication failure occurs between BMU and BME
-boolean bmcComFlag =false;       // Communication failure occurs between BMU and BMC
+boolean selfTestFlag = false;     // self-check failures are sent from BME                                
+boolean bmeAlarmFlag = false;     // If any cell over/under voltage failures or self-check failures are sent from BME 
+boolean bmeComFlag = false;       // Communication failure occurs between BMU and BME
+boolean bmcComFlag = false;       // Communication failure occurs between BMU and BMC
 
-boolean driveCurflag=false;          //Current >20 durring Drive
-boolean chargeCurFlag=false;      //Current > 92A or current <2A during Charge
-boolean stopCurFlag=false;     //abs(Current)>1A
+boolean driveCurflag = false;          //Current >20 durring Drive
+boolean chargeCurFlag = false;      //Current > 92A or current <2A during Charge
+boolean stopCurFlag = false;     //abs(Current)>1A
 
-boolean timeoutFlag=false;      //Charging or balance time > 10 hours
+boolean timeoutFlag = false;      //Charging or balance time > 10 hours
 
-boolean chargeDoneFlag =false;   // charging done flag
-boolean balDoneFlag =false;      // balancing done flag
-boolean balRecFlag =false;       // balancing recommended flag
-boolean balRelaxFlag=false;      // true when system has relaxed
-boolean realBalDataFlag=false;
+boolean chargeDoneFlag = false;   // charging done flag
+boolean balDoneFlag = false;      // balancing done flag
+boolean balRecFlag = false;       // balancing recommended flag
+boolean balRelaxFlag = false;      // true when system has relaxed
+boolean realBalDataFlag = false;
 
-boolean fanOn=false;
+boolean fanOn = false;
 
 
 //************************ SPI parameters *************************//
@@ -277,18 +277,18 @@ const int MISOPin=50;
 //************************ Ethernet parameters *************************//
 // Enter a MAC address and IP address for your controller below.
 // The IP address will be dependent on your local network:
-byte BMUNum=0;
-byte Add0=5;
-byte Add1=6;
-byte Add2=7;
+byte BMUNum = 0;
+byte Add0 = 5;
+byte Add1 = 6;
+byte Add2 = 7;
 //byte mac[6] = { 0xDE, 0xAD, 0xBE, 0xEF, 0xFE, 0xE1 };
 byte mac[6] = {0};
-byte ipadd[]={192,168,0, 170};
+byte ipadd[] = {192,168,0, 170};
 // the router's gateway address:
 byte gateway[] = { 192, 168, 0, 1 };
 // the subnet:
 byte subnet[] = { 255, 255, 255, 0 };
-int port=40;
+int port = 40;
 //IPAddress ip(ipadd);
 EthernetServer server(port);
 // Initialize the Ethernet server library
@@ -297,7 +297,7 @@ EthernetServer server(port);
 
 //**************************** Voltage lookup tables ************************//
 
-int lookUpSOC[1046]={1000,999,998,997,996,995,994,993,992,991,991,990,989,988,987,986,985,984,983,982,981,980,979,978,977,976,975,974,973,
+int lookUpSOC[1046] = {1000,999,998,997,996,995,994,993,992,991,991,990,989,988,987,986,985,984,983,982,981,980,979,978,977,976,975,974,973,
 972,971,970,969,969,968,967,966,965,964,963,962,961,960,959,958,957,956,955,954,953,952,951,950,949,948,947,947,946,945,944,943,942,941,
 940,939,938,937,936,935,934,933,932,931,930,929,928,927,926,925,925,924,923,922,921,920,919,918,917,916,915,914,913,912,911,910,909,908,
 907,906,905,904,903,903,902,901,900,899,898,897,896,895,894,893,892,891,890,889,888,887,886,885,884,883,882,881,881,880,879,878,877,876,

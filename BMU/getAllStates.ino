@@ -4,14 +4,17 @@
  * Measures and calculates all states of half string
  *-----------------------------------------------------------------------------*/
  void measCalAllstates(void){
-  if(pseudoDataFlag) 
+  if(pseudoDataFlag){ 
     PseudoData();
-  else 
-    getBMEData();               // gets data from all BMEs 
+  }
+  else{ 
+    getBMEData(); // gets data from all BMEs
+  }     
   calStateBME();              // calculates state of BME's
  
-  if(!pseudoDataFlag) 
+  if(!pseudoDataFlag){ 
     getBMUData();               //gets data for the half-string
+  }
   calStateBMU();              // calculates the state of the half-string
  }
 
@@ -20,17 +23,18 @@
  * Measures and calculates data on a half string level 
  *-----------------------------------------------------------------------------*/
  void getBMUData(void){
-  fwLeak=!digitalRead(frontWPin);
-  bwLeak=!digitalRead(backWPin);
-  totalVoltage=avgADC(tVolInPin,4)*volConst;
-  if(fakeTotVolFlag) totalVoltage=fakeStuff.totalVoltage;  //
-  pressure=avgADC(presIn1Pin,5)*presConst-presOffset;    //get pressure
+  fwLeak = !digitalRead(frontWPin);
+  bwLeak = !digitalRead(backWPin);
+  totalVoltage = avgADC(tVolInPin,4)*volConst;
+  if(fakeTotVolFlag) totalVoltage = fakeStuff.totalVoltage;  //
+  presOld = pressure;
+  pressure = avgADC(presIn1Pin,3)*presConst-presOffset;    //get pressure
   
   if (fakePressFlag) fakePressureData();
-  current0=avgADC(cur0InPin,3);//analogRead(cur0InPin);
-  curMeas=(avgADC(curInPin,3)-(float)current0)*curConst;
-  current=curMeas-currentOffset;
-  if(fakeCurFlag) current=fakeStuff.current;
+  current0 = avgADC(cur0InPin,3);//analogRead(cur0InPin);
+  curMeas = (avgADC(curInPin,3)-(float)current0)*curConst;
+  current = curMeas-currentOffset;
+  if(fakeCurFlag) current = fakeStuff.current;
 //  if (abs(current)<=.4) current=0;
 
  }
@@ -44,7 +48,7 @@
  void calStateBMU(void){
   
   socCal();                              //calculates the state of charge
-  presRate= biquadFilter(biPresrate, pressure);                // filtered pressure rate
+  presRate= biquadFilter(biPresrate, pressure-presOld);                // filtered pressure rate
 //  presRate=rateCal(pressure,presOld);    // calculates pressure rate
 //  presOld=pressure;                      //set the old pressure value to the new one
  }
@@ -323,9 +327,10 @@
  *-----------------------------------------------------------------------------*/
  float biquadFilter(BiquadType biPram, float input){
     // Apply Filter
+    // BIQUAD DIRECT FORM TYPE 2
     float x = biPram.gain*input - biPram.a1*biPram.x1 - biPram.a2*biPram.x2;
     float out = biPram.b0*x + biPram.b1*biPram.x1 + biPram.b2*biPram.x2;
-    // Update states
+    // Update filter states
     biPram.x2 = biPram.x1;
     biPram.x1 = x;
     return out;
@@ -352,27 +357,27 @@
  *-----------------------------------------------------------------------------*/
  void PseudoData(void){
   int i,j;
-  fwLeak=false;
-  bwLeak=false;
-  totalVoltage=168;
-  if(fakeTotVolFlag) totalVoltage=fakeStuff.totalVoltage;
-  pressure=avgADC(presIn1Pin,5)*presConst-presOffset;
+  fwLeak = false;
+  bwLeak = false;
+  totalVoltage = 168;
+  if(fakeTotVolFlag) totalVoltage = fakeStuff.totalVoltage;
+  presOld = pressure;
+  pressure = avgADC(presIn1Pin,3)*presConst-presOffset;
   if (fakePressFlag) fakePressureData();
-  current0=0;
-  curMeas=0;
-  current=0;
+  current0 = 0;
+  curMeas = 0;
+  current = 0;
   if(fakeCurFlag) current=fakeStuff.current;
     
-  for(int j=0;j<BMENum;j++){ 
-    for(int i=0;i<3;i++) {
-      
-      BME[j].vol[2-i]=40000+random(-20, 20);; // 4V*10000
-      BME[j].temp[2-i]=20000; //?
-      BME[j].uFlag[i]= false;
-      BME[j].oFlag[i]= false;
+  for(int j = 0; j < BMENum; j++){ 
+    for(int i = 0; i < 3; i++) {
+      BME[j].vol[2-i] = 40000+random(-20, 20); // 4V*10000
+      BME[j].temp[2-i] = 20000; //?
+      BME[j].uFlag[i] = false;
+      BME[j].oFlag[i] = false;
     }
-    BME[j].dataCheck=false;
-    BME[j].temp[3] =20000; //? 
+    BME[j].dataCheck = false;
+    BME[j].temp[3] = 20000; //? 
     BME[j].vref2 = 30000;//? 3v*10000
     BME[j].vSum = 6000;//? 12V *500
     BME[j].iTemp = 22500;//?  
@@ -381,7 +386,7 @@
   
   if (fakeTempFlag) fakeTemperatureData();
   if (fakeVolFlag) fakeVoltageData();  
-  for(int i=0;i<BMENum;i++){
+  for(int i = 0; i < BMENum; i++){
     int2float((BMEdata&) BME[i]); // passes pointer to BME[i]
   }
 
