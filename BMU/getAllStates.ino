@@ -48,7 +48,7 @@
  void calStateBMU(void){
   
   socCal();                              //calculates the state of charge
-  presRate= biquadFilter(biPresrate, pressure-presOld);                // filtered pressure rate
+  presRate= biquadFilter(biPresrate, (pressure-presOld)*dtRecip);                // filtered pressure rate
 //  presRate=rateCal(pressure,presOld);    // calculates pressure rate
 //  presOld=pressure;                      //set the old pressure value to the new one
  }

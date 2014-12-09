@@ -24,7 +24,7 @@
  
   #define presHighLimit 5.0    //High pressure limit
   #define presLowLimit 0.5     //Low Pressure limit
-  #define presRateHigh 0.3    //High pressure rate limit
+  #define presRateHigh 0.013    //High pressure rate limit
   
   #define inCurLimit 2.0      //current in limit durring Drive
   #define highInCur 92.0      //high current in limit during Charging 
@@ -110,6 +110,7 @@
  // loop timing variables
  const long controlTime = 200000;  // loop time in uSec  .2 s loops ==> 5Hz
  const float dt = controlTime/1000000.0;  // control time in sec
+ const float dtRecip = 1/dt;
  unsigned long timeStamp = 0;          // used to keep track of the loop time
  unsigned long balanceTimeStamp = 0;  // keeps track of balancing timing
  unsigned long bmcComTimeStamp = 0;   // keeps track of time since last communication
