@@ -88,12 +88,12 @@ void pinInital(void){
 //  if(uartPrint) Serial.println(BMUNum);
 //  if(uartPrint) Serial.println(ipadd[3]);
   
-  for(i=0;i<6;i++){
-    if(BMUNum==0) mac[i] =  macTempo0[i];
-    if(BMUNum==0) mac[i] =  macTempo1[i];
-    if(BMUNum==0) mac[i] =  macTempo2[i];
-    if(BMUNum==0) mac[i] =  macTempo3[i];
-  }
+  if(BMUNum == 0) memcpy( mac, macTempo0, 6 );
+  if(BMUNum == 1) memcpy( mac, macTempo1, 6 );
+  if(BMUNum == 2) memcpy( mac, macTempo2, 6 );
+  if(BMUNum == 3) memcpy( mac, macTempo3, 6 );
+
+
   
   
   IPAddress ip(ipadd);
@@ -111,14 +111,14 @@ void pinInital(void){
 
 void intitBiquadFil()
 {
-  // [b, a] = butter(2,.175*2/5) in Matlab
-  // second order butterworthcutoff freq at 0.175 normalized nyquist freq, sampling 5hz
+  // [b, a] = butter(2,.16*2/5) in Matlab
+  // second order butterworthcutoff freq at 0.16 normalized nyquist freq, sampling 5hz
   biPresrate.gain=1;//filter gain
-  biPresrate.b0 = 0.0104;              //input k coefficient
-  biPresrate.b1 = 0.0209;              //input k-1 coefficient
-  biPresrate.b2 = 0.0104;                //input k-2 coefficient
-  biPresrate.a1 = -1.6910;                //output k-1 coefficient
-  biPresrate.a2 = 0.7327;                //output k-2 coefficient
+  biPresrate.b0 = 0.0088;              //input k coefficient
+  biPresrate.b1 = 0.0177;              //input k-1 coefficient
+  biPresrate.b2 = 0.0088;                //input k-2 coefficient
+  biPresrate.a1 = -1.7172;                //output k-1 coefficient
+  biPresrate.a2 = 0.7525;                //output k-2 coefficient
   biPresrate.x1 = pressure-presOld;  //filter state
   biPresrate.x2 = biPresrate.x1;    //filter state
 }

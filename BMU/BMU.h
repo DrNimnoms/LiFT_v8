@@ -23,8 +23,8 @@
   #define volModMismatch 0.06   //voltage mismatch limit between calculated and measured total voltage of battery module
  
   #define presHighLimit 5.0    //High pressure limit
-  #define presLowLimit 0.5     //Low Pressure limit
-  #define presRateHigh 0.013    //High pressure rate limit
+  #define presLowLimit  0.5     //Low Pressure limit
+  #define presRateHigh 0.05    //High pressure rate limit
   
   #define inCurLimit 2.0      //current in limit durring Drive
   #define highInCur 92.0      //high current in limit during Charging 
@@ -69,7 +69,7 @@
   #define ONESECOND 1000000   // in microseconds
 
 // debugging variables
-  boolean uartPrint=false;    // print for debugging
+  boolean uartPrint= false;    // print for debugging
   String inputString="";
   boolean fakeVolFlag=false;
   boolean fakePressFlag=false;
@@ -77,7 +77,7 @@
   boolean fakeTotVolFlag=false;
   boolean fakeModVolFlag=false;
   boolean fakeCurFlag=false;
-  boolean pseudoDataFlag=false;
+  boolean pseudoDataFlag = false;
   
   enum mode { STOPMODE, DRIVEMODE, CHARGEMODE,BALANCEMODE};
   

@@ -5,10 +5,10 @@
  
  void timeCheck(void){
    if(areWeThereYet(timeStamp, controlTime)){
-     unsigned long currentTimeStamp =micros();
-     unsigned long timeSince=0;
+     unsigned long currentTimeStamp = micros();
+     unsigned long timeSince = 0;
      if(timeStamp > currentTimeStamp){                // check if a rollover has occured
-        timeSince= ~(timeStamp - currentTimeStamp)+1;              // correct for rollover
+        timeSince = ~(timeStamp - currentTimeStamp)+1;              // correct for rollover
      }
      else{
        timeSince = currentTimeStamp-timeStamp;
@@ -31,18 +31,19 @@
  * returns false if not
  *----------------------------------------------------------------------------*/
  boolean areWeThereYet(const unsigned long &referenceTimeStamp, const long &waitTime){
-   unsigned long timeSince= timeElapsed(referenceTimeStamp);
-   if (timeSince>=waitTime)
+   unsigned long timeSince = timeElapsed(referenceTimeStamp);
+   if (timeSince >= waitTime)
      return true;
    else
      return false;
  }
  
+ // returns time elapse since the timestamp arguement in mirco seconds
  long timeElapsed(const unsigned long &referenceTimeStamp){
-   unsigned long currentTimeStamp =micros();
-   long timeSince=0;
+   unsigned long currentTimeStamp = micros();
+   long timeSince = 0;
    if (referenceTimeStamp > currentTimeStamp){                // check if a rollover has occured
-      timeSince= ~(referenceTimeStamp - currentTimeStamp)+1;              // correct for rollover
+      timeSince = ~(referenceTimeStamp - currentTimeStamp)+1;              // correct for rollover
     }
    else timeSince = currentTimeStamp-referenceTimeStamp;
    return timeSince;
