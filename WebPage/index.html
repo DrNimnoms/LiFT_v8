@@ -302,7 +302,7 @@ $(document).ready(function () {
 							},
 						"4":
 							{
-								"desc":"(Flag ID 5): Rapid pressure change detected, possbile cell failure.",
+								"desc":"(Flag ID 5): Rapid pressure change detected, possible cell failure.",
 								"drive":2,
 								"stop":3,
 								"balance":1,
@@ -1390,7 +1390,7 @@ $(document).ready(function () {
 					}
 					$("#flagpop"+popUpIdStr).wijdialog("close");
 					$("#flagpop"+popUpIdStr).hide();
-				}, 49000);
+				}, 53400);
 			//writeLog("Status 1-timerID[bmu] : " + timerID[bmuIndex]);
 		}
 		else {
@@ -2228,7 +2228,7 @@ $(document).ready(function () {
 		//writeLog(bmuIndex+"::"+lastDT);
 		//var timeDifference = now - lastDT;
 		//timestamps are in milliseconds
-		if((now - lastDT) >= 10000) {
+		if((now - lastDT) >= 30000) {
 			//writeLog("BMU "+bmu+" lost comm.");
 			//writeLog(" checkTime::bmuIndex=" + bmuIndex + "::TD "+ timeDifference);// +now-lastDT);
             bmuComm[bmuIndex] = 0;
