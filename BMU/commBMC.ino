@@ -26,7 +26,7 @@ void BMCcomm()
           BMCcommand += c; //store characters to string 
         }    
       }
-      Serial.println(BMCcommand);
+//      Serial.println(BMCcommand);
       if(BMCcommand.indexOf("cle") >=0) {
         clearFlags();            //clear flags
       }
