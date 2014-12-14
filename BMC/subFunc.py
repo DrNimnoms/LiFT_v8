@@ -127,7 +127,7 @@ def get_command(n):
         result = SQLComm[1].fetchone()
         result = result[0]
     except:
-        result = "stop"
+        result = "nodata"
         communicationFlags[6] = 0
     return result
 
@@ -234,7 +234,7 @@ def process_data(v, index):
     for i in range(startInx+BMEnum*4,startInx+BMEnum*5):
       value[i] = value[i]*0.0001
     #convert auxiliary temperature
-    Binv = .00023866  # 1/ B-value where B-value is 4190 K
+    Binv = .00024777  # 1/ B-value where B-value is 4190 K
     T0inv = 0.003354  # 1/T_0 where T_0 is 298.15 K
     for i in range(startInx+BMEnum*5, startInx+BMEnum*9):
         value[i] *= 0.0001

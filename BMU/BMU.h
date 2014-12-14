@@ -24,7 +24,7 @@
  
   #define presHighLimit 5.0    //High pressure limit
   #define presLowLimit  0.5     //Low Pressure limit
-  #define presRateHigh 0.05    //High pressure rate limit
+  #define presRateHigh 0.06    //High pressure rate limit
   
   #define inCurLimit 2.0      //current in limit durring Drive
   #define highInCur 92.0      //high current in limit during Charging 
@@ -54,7 +54,7 @@
 
 // temperature reading prameters
   #define IntTempConst  0.013333  //0.1mV/7.5mV is the convertion from the reading to K for internal temperature
-  #define Binv .00024777  // 1/ B-value where B-value is 4190 K
+  #define Binv .00024777  // 1/ B-value where B-value is 4036 K
   #define T0inv 0.003354  // 1/T_0 where T_0 is 298.15 K
 //  #define VIN 5.0      // Temperature reference
   

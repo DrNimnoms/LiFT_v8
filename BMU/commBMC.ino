@@ -8,7 +8,7 @@
 void BMCcomm()
 {  
   //if(loopCount%bmcComTime==0){      //execute once a secloop areWeThereYet(BMCcommdt,960000)
-  if(areWeThereYet(bmcComTimeStamp,THREESECOND)) bmcComFlag=true;
+  if(areWeThereYet(bmcComTimeStamp,TENSECONDS)) bmcComFlag=true;
 
    // listen for incoming clients
     EthernetClient client = server.available();
@@ -26,6 +26,7 @@ void BMCcomm()
           BMCcommand += c; //store characters to string 
         }    
       }
+      Serial.println(BMCcommand);
       if(BMCcommand.indexOf("cle") >=0) {
         clearFlags();            //clear flags
       }

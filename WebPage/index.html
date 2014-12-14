@@ -2228,7 +2228,7 @@ $(document).ready(function () {
 		//writeLog(bmuIndex+"::"+lastDT);
 		//var timeDifference = now - lastDT;
 		//timestamps are in milliseconds
-		if((now - lastDT) >= 30000) {
+		if((now - lastDT) >= 10000) {
 			//writeLog("BMU "+bmu+" lost comm.");
 			//writeLog(" checkTime::bmuIndex=" + bmuIndex + "::TD "+ timeDifference);// +now-lastDT);
             bmuComm[bmuIndex] = 0;
