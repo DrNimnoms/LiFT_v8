@@ -1372,28 +1372,31 @@ $(document).ready(function () {
 	}
 
     
-    function count60(status, bmuIndex,flagIndex) { //bmu should be in the range 1-4
+    function count60(status, bmuIndex,counter) { //bmuIndex should be in the range 0-3
 		var popUpIdStr = bmuIndex+1;
-		//start timer
 		//writeLog("Count 60 entered. Status="+status+" and bmuIndex =" +bmuIndex);
-		if(status) {
-			writeLog("In 60 seconds, " + hsNames[bmuIndex]+ " will enter OFF MODE");
-			timerID[bmuIndex] = setTimeout(
-				function() {
-					if(bmuIndex == 0 || bmuIndex == 1) {
-						//~ $("#stopPort").trigger("click");
-						enterStop("PORT");
-					}
-					else if (bmuIndex == 2 || bmuIndex == 3) {
-						//~ $("#stopStar").trigger("click");
-						enterStop("STBD");
-					}
-					$("#flagpop"+popUpIdStr).wijdialog("close");
-					$("#flagpop"+popUpIdStr).hide();
-				}, 53400);
-			//writeLog("Status 1-timerID[bmu] : " + timerID[bmuIndex]);
+		if(status){
+                  
+                  //update title
+                  $("#flagpop"+popUpIdStr).prop('title', "PORT AFT Countdown:" + counter + "s");
+                  
+                  if (counter < 0){ // if countdown finished, then enter stopmode
+                    if(bmuIndex == 0 || bmuIndex == 1) {
+                        ~$("#stopPort").trigger("click");
+                        enterStop("PORT");
+                    }
+                    else if (bmuIndex == 2 || bmuIndex == 3) {
+                        ~ $("#stopStar").trigger("click");
+                        enterStop("STBD");
+                    }
+                    $("#flagpop"+popUpIdStr).wijdialog("close");
+                    $("#flagpop"+popUpIdStr).hide();
+                  }
+                  else{ // if countdown is NOT finished, check in 1 second with reduced counter
+                    timerID[bmuIndex] = setTimeout(count60(1,bmuIndex,counter--), 1000);
+                  }
 		}
-		else {
+		else { // cancel the countdown because status = 0
 			clearTimeout(timerID[bmuIndex]);
 			$("#flagpop"+popUpIdStr).wijdialog("close");
 			$("#flagpop"+popUpIdStr).hide();
@@ -1405,7 +1408,7 @@ $(document).ready(function () {
 	// gets json data string for specified bmu#
 	function getData(bmuIndex) {
 		var bmuId = bmuIndex + 1;
-		var jsonstr="";
+		var jsonstr = "";
 		$.ajax({ url: 'db.php?key=all&b='+bmuId.toString(),
 			type: 'GET',
 			async: false,
@@ -1807,7 +1810,7 @@ $(document).ready(function () {
     {
         var floatval = parseFloat(value);
 		var output="";
-        if (floatval > 55)
+        if (floatval > 75)
 			output = '<span class="text-error">'+value+'</span>';
 		else
 			output = value;
@@ -1904,8 +1907,8 @@ $(document).ready(function () {
 		}
 		// if no priority 1's are found, process all flags > 2
 		else{
-			var priorityTwoList=[]; // list of priority two flags
-			var p2desc=""; // description of priority two flags
+			var priorityTwoList = []; // list of priority two flags
+			var p2desc = ""; // description of priority two flags
 			
 			for(var n = 0; n < bmuActiveFlagList[bmuIndexStr].length;n++) {
 				var flagIndex = bmuActiveFlagList[bmuIndexStr][n];
@@ -1981,11 +1984,11 @@ $(document).ready(function () {
 	// arguments:
 	//   purpose:
 	function throwPopUp(txt, p2List, bmuIndex) 
-	{	
+	{
 		var bmuIndexStr = bmuIndex.toString();
 		var popUpIdStr = bmuIndex+1;
 		//writeLog("throwPopUp:: popUpIdStr="+popUpIdStr);
-		var txt1=txt+"<br> <b>The effected battery string will turn off in 60 seconds.</b>";
+		var txt1 = txt+"<br> <b>The effected battery string will turn off in 60 seconds.</b>";
 		$("#flagpop"+popUpIdStr).show();
 		document.getElementById("flagpop"+popUpIdStr).innerHTML = txt1;
 		
@@ -1993,10 +1996,8 @@ $(document).ready(function () {
 			side = "Port";
 		}
 		else{
-			var side="Star";
+			var side = "Star";
 		}
-		count60(0, bmuIndex,-1); //clear any old timers,
-		count60(1, bmuIndex,-1); //start a fresh countdown
 		if(side == "Port") {
 			$("#flagpop"+popUpIdStr).wijdialog({
 				autoOpen: true,
@@ -2016,32 +2017,32 @@ $(document).ready(function () {
 						setBtnState();
 					},
 					"Override": function () {
-						$("#flagpop"+popUpIdStr).wijdialog("close");
-						$("#flagpop"+popUpIdStr).hide();
-						writeLog(hsNames[bmuIndex]+" Override "+txt+".");
+						$("#flagpop" + popUpIdStr).wijdialog("close");
+						$("#flagpop" + popUpIdStr).hide();
+						writeLog(hsNames[bmuIndex] + " Override " + txt + ".");
 						//setCommand("override_"+flagID,numBmu);
-						for(var n=0;n < p2List.length; n++){
+						for(var n = 0; n < p2List.length; n++){
 							var flagIndex = p2List[n];
 							if(bmuOverrideFlagList[bmuIndexStr].indexOf(flagIndex) < 0){
 								bmuOverrideFlagList[bmuIndexStr].push(flagIndex);
 							}
 						}
-						var ovFlags="";
+						var ovFlags = "";
 						var n = 0;
-						for(n = 0;n < bmuOverrideFlagList[bmuIndexStr].length;n++){
-							ovFlags = ovFlags+"_"+(bmuOverrideFlagList[bmuIndexStr][n]+1);
+						for(n = 0; n < bmuOverrideFlagList[bmuIndexStr].length; n++){
+							ovFlags = ovFlags + "_" + (bmuOverrideFlagList[bmuIndexStr][n] + 1);
 						}
 						bmuOverride[bmuIndex] = 2;
-						setCommand("override"+ovFlags,bmuIndex);
-						playAlarm(0,bmuIndex);
-						count60(0, bmuIndex,-1);
-						if(debug) console.log("Port override"+ovFlags);
+						setCommand("override" + ovFlags, bmuIndex);
+						playAlarm(0, bmuIndex);
+						count60(0, bmuIndex, -1);
+						if(debug) console.log("Port override" + ovFlags);
 					}
 				}
 			});
 		}
 		else {
-			$("#flagpop"+popUpIdStr).wijdialog({
+			$("#flagpop" + popUpIdStr).wijdialog({
 				autoOpen: true,
 				resizable: false,
 				height: 310,
@@ -2083,6 +2084,8 @@ $(document).ready(function () {
 				}
 			});
 		}
+        count60(0, bmuIndex,-1); //clear any old timers,
+        count60(1, bmuIndex,60); //start a fresh countdown
     }
     
     function getFlagsDescription(flagIndex){
@@ -2424,8 +2427,8 @@ $(document).ready(function () {
 		//iterate through each bmu obj and update half-string table values
 		for(var bmuIndex=0;bmuIndex<bmu.length;bmuIndex++) {
 			
-			var i=bmuIndex;
-			var bmunum=i+1;
+			var i = bmuIndex;
+			var bmunum = i+1;
 			
 			//checks if its communicated within 10 seconds
 			checkCommunication(bmuIndex); //check for new data in db
@@ -2457,7 +2460,7 @@ $(document).ready(function () {
 				
 			//setHalfStringTable();	
 			//populate tables
-			var tmpObj=bmu[bmuIndex];
+			var tmpObj = bmu[bmuIndex];
 			for(var key in tmpObj) {
 				if(tmpObj.hasOwnProperty(key)) {
 					//update voltages
@@ -2482,19 +2485,19 @@ $(document).ready(function () {
     	
 
 	//execute last commands on page load:
-	var n=0;
-	for(n=0;n<lastcmd.length/2;n++) {
-		var str=getLastCmd(2*n+1);
-		var key="Star";
-		if(n<1)
-			key="Port";
+	var n = 0;
+	for(n = 0; n < lastcmd.length/2; n++) {
+		var str = getLastCmd(2*n+1);
+		var key = "Star";
+		if(n < 1)
+			key = "Port";
 		//~ if(n==0)
 			//~ writeLog("Executing last command PORT: "+lastcmd[n]);
 		//~ else if(n==1)
 			//~ writeLog("Executing last command STBD: "+lastcmd[2*n]);
 			
 		//~ if(debug) console.log("last command of bmu #"+(n+1) + ": "+str);
-		if(str=="drive")
+		if(str == "drive")
 			$("#drive"+key).trigger("click");
 		else if(str=="stop" || str=="clearstop")
 			$("#stop"+key).trigger("click");
@@ -2521,10 +2524,10 @@ $(document).ready(function () {
 
 /* clock */
 function startTime() {
-    var today=new Date();
-    var h=today.getHours();
-    var m=today.getMinutes();
-    var s=today.getSeconds();
+    var today = new Date();
+    var h = today.getHours();
+    var m = today.getMinutes();
+    var s = today.getSeconds();
     m = checkTimeZero(m);
     s = checkTimeZero(s);
     document.getElementById('clock').innerHTML = h+":"+m+":"+s;
