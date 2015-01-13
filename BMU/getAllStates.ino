@@ -48,7 +48,7 @@
  void calStateBMU(void){
   
   socCal();                              //calculates the state of charge
-  presRate= biquadFilter(biPresrate, (pressure-presOld)*dtRecip);                // filtered pressure rate
+  presRate = biquadFilter(biPresrate, (pressure-presOld)*dtRecip);                // filtered pressure rate
 //  presRate=rateCal(pressure,presOld);    // calculates pressure rate
 //  presOld=pressure;                      //set the old pressure value to the new one
  }
@@ -70,8 +70,8 @@
   ADCV(0,0);          //  broadcast to all channels
   delayMicroseconds(BMEConDelay1);
   
-  for(int i=0;i<BMENum;i++){ 
-    RDCVA((BMEdata&) BME[i]);
+  for(int i = 0; i < BMENum; i++){ 
+    RDCVA((BMEdata&) BME[i]); // get cell voltages of layers
   }
   
   // get cell temperatures
@@ -91,16 +91,16 @@
     RDSTATB((BMEdata&) BME[i]);
   }
 //  BME[8].DCC=6;
-  for(i=0;i<BMENum;i++){               // Cycles through BME's
-    BME[i].GPIO=0x0f|((!fanOn)<<4);          // Sets the GPIO to 0 or 1 for the multiplexer
+  for(i = 0;i < BMENum; i++){               // Cycles through BME's
+    BME[i].GPIO = 0x0f|((!fanOn)<<4);          // Sets the GPIO to 0 or 1 for the multiplexer
     WRCFG((BMEdata&) BME[i]);          // Sends out the GPIO command
   }
   
 
-  if (modeInfo.currentMode==BALANCEMODE && balRelaxFlag) saturateBalanceVoltage();
+  if (modeInfo.currentMode == BALANCEMODE && balRelaxFlag) saturateBalanceVoltage();
   if (fakeTempFlag) fakeTemperatureData();
   if (fakeVolFlag) fakeVoltageData();
-  for(int i=0;i<BMENum;i++){
+  for(int i = 0; i < BMENum; i++){
     int2float((BMEdata&) BME[i]); // passes pointer to BME[i]
   }
 }
@@ -301,15 +301,15 @@
    int i,j;
    for(j=0;j<BMENum;j++){
      for(i=0;i<cellNum;i++){  
-       if(BME[j].vol[i]> (int)(maxVol*10000)){
-         BME[j].vol[i]=(int)(maxVol*10000);
+       if(BME[j].vol[i] > (int)(maxVol*10000)){
+         BME[j].vol[i] = (int)(maxVol*10000);
 //         if(uartPrint)Serial.print("upper saturation is occurring for bme");
 //         if(uartPrint)Serial.print(j);
 //         if(uartPrint)Serial.print("and layer");
 //         if(uartPrint)Serial.println(i);
        }
-       else if(BME[j].vol[i]< (int)((minVol-.001)*10000)){
-         BME[j].vol[i]=(int)((minVol-.001)*10000);
+       else if(BME[j].vol[i] < (int)((minVol-.001)*10000)){
+         BME[j].vol[i] = (int)((minVol-.001)*10000);
 //         if(uartPrint)Serial.print("lower saturation is occurring for bme");
 //         if(uartPrint)Serial.print(j);
 //         if(uartPrint)Serial.print(" layer");

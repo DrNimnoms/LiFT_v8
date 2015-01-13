@@ -1370,15 +1370,13 @@ $(document).ready(function () {
 		elem.innerHTML += "<small>" + logText + ' - ' + currentDateTime() + "</small><br/>";
 		elem.scrollTop = elem.scrollHeight;
 	}
-
     
     function count60(status, bmuIndex,counter) { //bmuIndex should be in the range 0-3
 		var popUpIdStr = bmuIndex+1;
 		//writeLog("Count 60 entered. Status="+status+" and bmuIndex =" +bmuIndex);
 		if(status){
-                  
                   //update title
-                  $("#flagpop"+popUpIdStr).prop('title', "PORT AFT Countdown:" + counter + "s");
+                  $("#flagpop"+popUpIdStr).prop('title', hsNames[bmuIndex] + " Countdown:" + counter + "s");
                   
                   if (counter < 0){ // if countdown finished, then enter stopmode
                     if(bmuIndex == 0 || bmuIndex == 1) {
