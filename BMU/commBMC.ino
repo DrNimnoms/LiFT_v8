@@ -8,34 +8,35 @@
 void BMCcomm()
 {  
   //if(loopCount%bmcComTime==0){      //execute once a secloop areWeThereYet(BMCcommdt,960000)
-  if(areWeThereYet(bmcComTimeStamp,TENSECONDS)) bmcComFlag=true;
+  if(areWeThereYet(bmcComTimeStamp,TENSECONDS)) bmcComFlag = true; // too much time has elapsed since communcation
+                                                                  //set the bmc communication flag
 
    // listen for incoming clients
     EthernetClient client = server.available();
     if (client) {
-      BMCcommdt=(int)(timeElapsed(bmcComTimeStamp)/1000); //milliseconds since last communication 
-      bmcComTimeStamp=micros();
+      BMCcommdt = (int)(timeElapsed(bmcComTimeStamp)/1000); //milliseconds since last communication 
+      bmcComTimeStamp = micros();
       if(bmcComFlag) {
         flagBMU=flagBMU & ~(0x008000);
-        bmcComFlag=false;
+        bmcComFlag = false;
       }
-      BMCcommand="";//clearing string for next read
-      while (client.available()) {
-        char c = client.read();
+      BMCcommand = "";//clearing string for next read
+      while (client.available()) {  // returns the number of bytes available for reading in the buffer
+        char c = client.read(); //reads from data stored in buffer, this is data already received
         if (BMCcommand.length() < 50) {
           BMCcommand += c; //store characters to string 
         }    
       }
 //      Serial.println(BMCcommand);
-      if(BMCcommand.indexOf("cle") >=0) {
+      if(BMCcommand.indexOf("cle") > =0) {
         clearFlags();            //clear flags
       }
-      else if(BMCcommand.indexOf("ign") >=0)//checks for ignore
+      else if(BMCcommand.indexOf("ign") >= 0)//checks for ignore
       { 
         if(uartPrint)Serial.println("Ignore temperature");
-        flagBMU=~(~flagBMU | (0xE));
-        flagOverride=~(~flagOverride | (0xE));
-        flagIgnoreTemp=true;
+        flagBMU = ~(~flagBMU | (0xE));
+        flagOverride = ~(~flagOverride | (0xE));
+        flagIgnoreTemp = true;
       }
       sendData((EthernetClient&) client);
     }

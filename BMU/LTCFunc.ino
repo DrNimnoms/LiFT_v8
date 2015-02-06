@@ -24,16 +24,16 @@ void LTC_initial() {
  *----------------------------------------------------------------------------*/
 void WRCFG(BMEdata& _BME)
 {
-  byte comm[2]={0x00,0x01};
-  comm[0]=comm[0]|_BME.addr;
+  byte comm[2] = {0x00,0x01};
+  comm[0] = comm[0]|_BME.addr;
   
   
-  CFGR[0]=0x7f | (_BME.GPIO<<3);
-  for(int i=1;i<4;i++){
-    CFGR[i]=CFGRIni[i];
+  CFGR[0] = 0x7f | (_BME.GPIO<<3);
+  for(int i=1; i<4; i++){
+    CFGR[i] = CFGRIni[i];
   }
-  CFGR[4]=(byte)_BME.DCC;
-  CFGR[5]=(_BME.DCC>>8) & B00001111;
+  CFGR[4] = (byte)_BME.DCC;
+  CFGR[5] = (_BME.DCC>>8) & B00001111;
   
   sendData(&comm[0],2);  // send the command writing configuration register group
   
@@ -95,44 +95,46 @@ void RDCFG(BMEdata& _BME, byte& CFGRR)
 
 /*------------------------------------------------------------------------------
  * void  RDCVA(BMEdata& _BME)
- *  Read Cell Voltages 1-3
+ *  Read Cell Voltages 1-3 for a specific BME
  *----------------------------------------------------------------------------*/
 void RDCVA(BMEdata& _BME)
 {
-  byte comm[2]={_BME.addr,0x04};
-  byte dataIn[6]={0};
-  int tempRev[3]={0};
-  boolean readCheck=false;
+  byte comm[2] = {_BME.addr,0x04};
+  byte dataIn[6] = {0};
+  int tempRev[3] = {0};
+  boolean readCheck = false;
   
   sendData(&comm[0],2); // send the command read the voltage for cells 1-4
-  readCheck=readData(&dataIn[0], 6);  // reads the data in
+  readCheck = readData(&dataIn[0], 6);  // reads the data in
   if(!readCheck){
     parseData((int*) tempRev, (byte*) dataIn,3); // parses the data in to the cell voltages 
     for(int i=0;i<3;i++) _BME.vol[2-i]=tempRev[i];
   }
-  _BME.dataCheck=_BME.dataCheck |readCheck;
+  _BME.dataCheck=_BME.dataCheck | readCheck;
 }
 
 
 /*------------------------------------------------------------------------------
  * void  RDAUXA(BMEdata& _BME)
- *  Read Cell Voltages of GPIO 1-3
+ *  Read Voltages on GPIO 1-3: Temperatures
  *----------------------------------------------------------------------------*/
 void RDAUXA(BMEdata& _BME)
 {
-  byte comm[2]={_BME.addr,0x0C};
-  byte dataIn[6]={0};
-  int tempRev[3]={0};
-  boolean readCheck=false;
+  byte comm[2] = {_BME.addr,0x0C};
+  byte dataIn[6] = {0};
+  int tempRev[3] = {0};
+  boolean readCheck = false;
   
   sendData(&comm[0],2); // send the command read the voltage for cells 1-4
-  readCheck=readData(&dataIn[0], 6);  // reads the data in
+  readCheck = readData(&dataIn[0], 6);  // reads the data in
   if(!readCheck) {
     parseData((int*) tempRev, (byte*) dataIn,3); // parses the data in to the cell voltages 
-    for(int i=0;i<2;i++) _BME.temp[i]=tempRev[i+1];
-    _BME.temp[3]=tempRev[0];
+    for(int i = 0; i < 2; i++){
+      _BME.temp[i] = tempRev[i+1]; // assigns temp 0 and temp 1
+    }
+    _BME.temp[3] = tempRev[0];   // assigns temp 3
   }
-  _BME.dataCheck=_BME.dataCheck | readCheck;
+  _BME.dataCheck = _BME.dataCheck | readCheck;
 }
 
 /*------------------------------------------------------------------------------
@@ -141,17 +143,19 @@ void RDAUXA(BMEdata& _BME)
  *----------------------------------------------------------------------------*/
 void RDAUXB(BMEdata& _BME)
 {
-  byte comm[2]={_BME.addr,0x0E};
-  byte dataIn[6]={0};
-  boolean readCheck=false;
+  byte comm[2] = {_BME.addr,0x0E};
+  byte dataIn[6] = {0};
+  boolean readCheck = false;
   
   sendData(&comm[0],2); // send the command read the voltage for cells 1-4
-  readCheck=readData(&dataIn[0], 6);  // reads the data in
+  readCheck = readData(&dataIn[0], 6);  // reads the data in
   if(!readCheck){
-    _BME.temp[2]= (dataIn[1]<<8) | dataIn[0];
-    _BME.vref2=(dataIn[5]<<8) | dataIn[4];
+    _BME.temp[2] = (dataIn[1]<<8) | dataIn[0];
+    if ((modeInfo.currentMode != BALANCEMODE) || realBalDataFlag){ 
+      _BME.vref2 = (dataIn[5]<<8) | dataIn[4];
+    }
   }
-  _BME.dataCheck=_BME.dataCheck | readCheck;
+  _BME.dataCheck = _BME.dataCheck | readCheck;
 }
 
 /*------------------------------------------------------------------------------
@@ -160,17 +164,19 @@ void RDAUXB(BMEdata& _BME)
  *----------------------------------------------------------------------------*/
 void RDSTATA(BMEdata& _BME)
 {
-  byte comm[2]={_BME.addr,0x10};
-  byte dataIn[6]={0};
-  boolean readCheck=false;
+  byte comm[2] = {_BME.addr,0x10};
+  byte dataIn[6] = {0};
+  boolean readCheck = false;
   
   sendData(&comm[0],2); // send the command read the voltage for cells 1-4
-  readCheck=readData(&dataIn[0], 6);  // reads the data in
+  readCheck = readData(&dataIn[0], 6);  // reads the data in
   if(!readCheck){
-    _BME.vSum= (dataIn[1]<<8) | dataIn[0];
-    _BME.iTemp= (dataIn[3]<<8) | dataIn[2];
+    if ((modeInfo.currentMode != BALANCEMODE) || realBalDataFlag){ 
+    _BME.vSum = (dataIn[1]<<8) | dataIn[0];
+    }
+    _BME.iTemp = (dataIn[3]<<8) | dataIn[2];
   }
-  _BME.dataCheck=_BME.dataCheck | readCheck;
+  _BME.dataCheck = _BME.dataCheck | readCheck;
 }
 
 /*------------------------------------------------------------------------------
@@ -179,16 +185,16 @@ void RDSTATA(BMEdata& _BME)
  *----------------------------------------------------------------------------*/
 void RDSTATB(BMEdata& _BME)
 {
-  byte comm[2]={_BME.addr,0x12};
-  byte dataIn[6]={0};
-  boolean readCheck=false;
+  byte comm[2] = {_BME.addr,0x12};
+  byte dataIn[6] = {0};
+  boolean readCheck = false;
   
   sendData(&comm[0],2); // send the command read the voltage for cells 1-4
-  readCheck=readData(&dataIn[0], 6);  // reads the data in
+  readCheck = readData(&dataIn[0], 6);  // reads the data in
   if(!readCheck){
-    for(int i=0;i<cellNum;i++){
-      _BME.uFlag[i]= (dataIn[2]>>(2*i)) & 0x01 ;
-      _BME.oFlag[i]= (dataIn[2]>>(2*i+1)) & 0x01;
+    for(int i = 0; i < cellNum; i++){
+      _BME.uFlag[i] = (dataIn[2]>>(2*i)) & 0x01 ;
+      _BME.oFlag[i] = (dataIn[2]>>(2*i+1)) & 0x01;
     }
   }
   _BME.dataCheck=_BME.dataCheck | readCheck;

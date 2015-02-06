@@ -225,13 +225,13 @@ void checkMode(String input){
       Serial.print("Balance to: ");
       Serial.println(balance2Vol,4);
     }
-    contactorsOn=false;
-    modeInfo.currentMode=BALANCEMODE;
+    contactorsOn = false;
+    modeInfo.currentMode = BALANCEMODE;
     modeReset();
-    balanceTimeStamp=micros(); //make sure balanceCal executes the first time through
-    balDoneFlag=false;
-    realBalDataFlag=false;
-    balRelaxFlag=false;
+    balanceTimeStamp = micros(); //make sure balanceCal executes the first time through
+    balDoneFlag = false;
+    realBalDataFlag = false;
+    balRelaxFlag = false;
     conOnTime=0;
  }
  

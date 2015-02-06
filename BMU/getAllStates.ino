@@ -62,7 +62,7 @@
   int i;
    
   for(i=0;i<BMENum;i++){ 
-    BME[i].dataCheck=false;
+    BME[i].dataCheck = false;
   }
   
   CLRCELL(0);          // wake the bme 
@@ -70,34 +70,45 @@
   ADCV(0,0);          //  broadcast to all channels
   delayMicroseconds(BMEConDelay1);
   
+ if(modeInfo.currentMode == BALANCEMODE){
+   realBalDataFlag = areWeThereYet(balanceTimeStamp,balanceCheckTime+6*controlTime);
+ }
+ else
+ {
+   realBalDataFlag = false;
+ }
+ 
+if ((modeInfo.currentMode != BALANCEMODE) || realBalDataFlag){ 
   for(int i = 0; i < BMENum; i++){ 
-    RDCVA((BMEdata&) BME[i]); // get cell voltages of layers
+    RDCVA((BMEdata&) BME[i]); // get cell voltages of layers, vol[0], vol[1],vol[2] 
   }
-  
+}
+
+   
   // get cell temperatures
   ADAX(0,0);
   delayMicroseconds(BMEConDelay1);
   
-  for(int i=0;i<BMENum;i++){
-    RDAUXA((BMEdata&) BME[i]);
-    RDAUXB((BMEdata&) BME[i]);  
+  for(int i = 0; i < BMENum; i++){
+    RDAUXA((BMEdata&) BME[i]); // get temp[0], temp[1], temp[3]
+    RDAUXB((BMEdata&) BME[i]);  // get temp[2], vref2
   }
   
   // get chip temperatures, sum of battery module 
   ADSTAT(0,0);
   delayMicroseconds(BMEConDelay2);
-  for(int i=0;i<BMENum;i++){
-    RDSTATA((BMEdata&) BME[i]);
-    RDSTATB((BMEdata&) BME[i]);
+  for(int i = 0; i < BMENum; i++){
+    RDSTATA((BMEdata&) BME[i]);  //gets vSum and iTemp
+    RDSTATB((BMEdata&) BME[i]);  //uFlog oFlag
   }
 //  BME[8].DCC=6;
-  for(i = 0;i < BMENum; i++){               // Cycles through BME's
+  for(i = 0; i < BMENum; i++){               // Cycles through BME's
     BME[i].GPIO = 0x0f|((!fanOn)<<4);          // Sets the GPIO to 0 or 1 for the multiplexer
     WRCFG((BMEdata&) BME[i]);          // Sends out the GPIO command
   }
   
 
-  if (modeInfo.currentMode == BALANCEMODE && balRelaxFlag) saturateBalanceVoltage();
+  //if (modeInfo.currentMode == BALANCEMODE && balRelaxFlag) saturateBalanceVoltage();
   if (fakeTempFlag) fakeTemperatureData();
   if (fakeVolFlag) fakeVoltageData();
   for(int i = 0; i < BMENum; i++){
@@ -114,19 +125,18 @@
  void calStateBME(void){
   
   if(modeInfo.currentMode!=BALANCEMODE){
-    minVol=findMinV();            //updates min cell voltage and total battery-string voltage
-    maxVol=findMaxV();            //updates max cell voltage and total battery-string voltage
+    minVol = findMinV();            //updates min cell voltage and total battery-string voltage
+    maxVol = findMaxV();            //updates max cell voltage and total battery-string voltage
   }
   else { // update during every relax period of balance mode
-    realBalDataFlag=areWeThereYet(balanceTimeStamp,balanceCheckTime+6*controlTime);
     if(realBalDataFlag || !balRelaxFlag){
-      minVol=findMinV();            //updates min cell voltage and total battery-string voltage
-      maxVol=findMaxV();            //updates max cell voltage and total battery-string voltage
+      minVol = findMinV();            //updates min cell voltage and total battery-string voltage
+      maxVol = findMaxV();            //updates max cell voltage and total battery-string voltage
     }
   }
-  maxTemp=findMaxT();                  // updates the max temperature reading
+  maxTemp = findMaxT();                  // updates the max temperature reading
   volSumCal();                       // sums all the virtual cell voltages into modules and half-strin voltage
-  if(fakeModVolFlag) BME[fakeStuff.BME].modSum=fakeStuff.modSum;
+  if(fakeModVolFlag) BME[fakeStuff.BME].modSum = fakeStuff.modSum;
  }
 
  /*------------------------------------------------------------------------------
