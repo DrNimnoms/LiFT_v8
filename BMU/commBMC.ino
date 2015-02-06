@@ -28,7 +28,7 @@ void BMCcomm()
         }    
       }
 //      Serial.println(BMCcommand);
-      if(BMCcommand.indexOf("cle") > =0) {
+      if(BMCcommand.indexOf("cle") >= 0) {
         clearFlags();            //clear flags
       }
       else if(BMCcommand.indexOf("ign") >= 0)//checks for ignore
