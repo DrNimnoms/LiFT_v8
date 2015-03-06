@@ -69,14 +69,14 @@
   #define ONESECOND 1000000   // in microseconds
 
 // debugging variables
-  boolean uartPrint= false;    // print for debugging
-  String inputString="";
-  boolean fakeVolFlag=false;
-  boolean fakePressFlag=false;
-  boolean fakeTempFlag=false;
-  boolean fakeTotVolFlag=false;
-  boolean fakeModVolFlag=false;
-  boolean fakeCurFlag=false;
+  boolean uartPrint = false;    // print for debugging
+  String inputString = "";
+  boolean fakeVolFlag = false;
+  boolean fakePressFlag = false;
+  boolean fakeTempFlag = false;
+  boolean fakeTotVolFlag = false;
+  boolean fakeModVolFlag = false;
+  boolean fakeCurFlag = false;
   boolean pseudoDataFlag = true;
   
   enum mode { STOPMODE, DRIVEMODE, CHARGEMODE,BALANCEMODE};
