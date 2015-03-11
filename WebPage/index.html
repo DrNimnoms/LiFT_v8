@@ -253,7 +253,7 @@ $(document).ready(function () {
 
 	var bmuCount60 = new Array(0,0,0,0);
 	var timerID = new Array("","","","");
-    var timerIDcounter = new Array(0,0,0,0);
+    var timerIDcounter= new Array(60,60,60,60);
 	var lastcmd = new Array("","","","");
 	var timeNow = new Date().getTime(); //milliseconds
 	var bmuDataTime = new Array(timeNow,timeNow,timeNow,timeNow);
@@ -1117,7 +1117,7 @@ $(document).ready(function () {
 		//~ writeLog("BMU"+ bmu + " OFF");
         setCommand("stop",bmuIndex);
         if(timerID[bmuIndex] > 0) { //if a timer for <bmu> is active
-			count60(0, bmuIndex); // cancel the active timer for <bmu>
+			count60(0, bmuIndex,""); // cancel the active timer for <bmu>
 			timerID[bmuIndex] = 0; // clear the timer I for <bmu>
 		}
 		playAlarm(0,bmuIndex); //stop alarm sound
@@ -1135,8 +1135,8 @@ $(document).ready(function () {
 		execStop(bmus[0]);
 		execStop(bmus[1]);
 		writeLog(side + " String has turned OFF.");
-		count60(0, bmus[0]);
-		count60(0, bmus[1]);
+		count60(0, bmus[0],"");
+		count60(0, bmus[1],"");
 		setBtnState();	
 	}
 
@@ -1328,7 +1328,7 @@ $(document).ready(function () {
         setCommand("clearstop",bmuIndex);
         bmuPrevDataTime[bmuIndex] = getLastDataTime(bmuIndex);
         if(timerID[bmuIndex]) {
-			count60(0, bmuIndex);
+			count60(0, bmuIndex,"");
 			timerID[bmuIndex] = 0;
 		}
     }
@@ -1372,15 +1372,17 @@ $(document).ready(function () {
 		elem.scrollTop = elem.scrollHeight;
 	}
     
-    function count60(status, bmuIndex) { //bmuIndex should be in the range 0-3
+    function count60(status, bmuIndex,txt) { //bmuIndex should be in the range 0-3
 		var popUpIdStr = bmuIndex+1;
-		//writeLog("Count 60 entered. Status="+status+" and bmuIndex =" +bmuIndex);
+		//writeLog("Count 60 entered. Status="+status+" and bmuIndex =" +bmuIndex +" Countdown:" + timerIDcounter[bmuIndex].toString());
+                  var theTimeLeft = Math.round(60 - (new Date().getTime() - timerIDcounter[bmuIndex])/1000);
+var txt1 = txt+"<br> <b>The effected battery string will turn off in approximately " + theTimeLeft + " seconds.</b>";
+		document.getElementById("flagpop"+popUpIdStr).innerHTML = txt1;
 		if(status){
                   //update title
-                  $("#flagpop"+popUpIdStr).prop('title', hsNames[bmuIndex] + " Countdown:" + timerIDcounter[bmuIndex] + "s");
                   
-                  if (timerIDcounter[bmuIndex] < 0){ // if countdown finished, then enter stopmode
-                    clearTimeout(timerID[bmuIndex]);
+                  if (theTimeLeft < 0){ // if countdown finished, 60 second has passed, then enter stopmode
+                    count60(0,bmuIndex,"");
                     if(bmuIndex == 0 || bmuIndex == 1) {
                         ~$("#stopPort").trigger("click");
                         enterStop("PORT");
@@ -1389,17 +1391,15 @@ $(document).ready(function () {
                         ~ $("#stopStar").trigger("click");
                         enterStop("STBD");
                     }
-                  count60(0,bmuIndex);
                   }
                   else{ // if countdown is NOT finished, check in 1 second with reduced counter
-                    timerIDcounter[bmuIndex] = timerIDcounter[bmuIndex]--;
+                  //writeLog(" Countdown:" + theTimeLeft);
                   }
 		}
 		else { // cancel the countdown because status = 0
 			clearTimeout(timerID[bmuIndex]);
 			$("#flagpop"+popUpIdStr).wijdialog("close");
 			$("#flagpop"+popUpIdStr).hide();
-            timerIDcounter[bmuIndex] = 60;
 			//writeLog(hsNames[bmuIndex]+ " is no longer entering OFF MODE");
 			//writeLog("Status 0- timerID[bmu] " + timerID[bmuIndex]);
 		}
@@ -1990,11 +1990,12 @@ $(document).ready(function () {
 		//writeLog("throwPopUp:: popUpIdStr="+popUpIdStr);
 		var txt1 = txt+"<br> <b>The effected battery string will turn off in 60 seconds.</b>";
 		$("#flagpop"+popUpIdStr).show();
-		document.getElementById("flagpop"+popUpIdStr).innerHTML = txt1;
+		document.getElementById("flagpop"+popUpIdStr).innerHTML = txt;
         //count60(0, bmuIndex); //clear any old timers,
-        timerID[bmuIndex] = setInterval(function(){ count60(1, bmuIndex), 1000); //start a fresh countdown
+        timerIDcounter[bmuIndex] = new Date().getTime(); //create a timestamp of when the timmer started
+        //writeLog("throwPopUp:: starttime="+timerIDcounter[bmuIndex]);
+        timerID[bmuIndex] = setInterval( function (){count60(1,bmuIndex,txt)}, 1000); //start a fresh countdown
                   
-    
 		if(bmuIndex == 0 || bmuIndex == 1){
 			side = "Port";
 		}
@@ -2015,7 +2016,7 @@ $(document).ready(function () {
 						execStop(0);
 						execStop(1);
 						writeLog("PORT String has turned OFF.");
-						count60(0, bmuIndex);
+						count60(0, bmuIndex,"");
 						portBtnState={"drivePort":0,"stopPort":1,"chargePort":0,"balancePort":0};
 						setBtnState();
 					},
@@ -2038,7 +2039,7 @@ $(document).ready(function () {
 						bmuOverride[bmuIndex] = 2;
 						setCommand("override" + ovFlags, bmuIndex);
 						playAlarm(0, bmuIndex);
-						count60(0, bmuIndex);
+						count60(0, bmuIndex,"");
 						if(debug) console.log("Port override" + ovFlags);
 					}
 				}
@@ -2058,7 +2059,7 @@ $(document).ready(function () {
 						execStop(2);
 						execStop(3);
 						writeLog("STBD String has turned OFF.");
-						count60(0, bmuIndex);
+						count60(0, bmuIndex,"");
 						starBtnState={"driveStar":0,"stopStar":1,"chargeStar":0,"balanceStar":0};
 						setBtnState();
 					},
@@ -2081,12 +2082,13 @@ $(document).ready(function () {
 						bmuOverride[bmuIndex] = 2;
 						setCommand("override"+ovFlags,bmuIndex);
 						playAlarm(0,bmuIndex);
-						count60(0, bmuIndex);
+						count60(0, bmuIndex,"");
 						if(debug) console.log("Port override"+ovFlags);
 					}
 				}
 			});
 		}
+
         
     }
     
@@ -2095,7 +2097,7 @@ $(document).ready(function () {
 	}
     
     function getFlagsPriorityLevel(flagIndex,bmuIndex){
-		var bmuId= bmuIndex+1;
+		var bmuId = bmuIndex + 1;
 		var priorityLevel = 0;
 		var str = "";
 		str = getLastActionCmd(bmuId); // supposed state of BMU
