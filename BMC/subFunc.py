@@ -25,19 +25,19 @@ loopTime = datetime.datetime.now()
 loopTime2 = datetime.datetime.now()
 waitTime = 0.2
 maxVol = 360
-cMax = 44.5
+cMax = [44.5, 44.5]
 cStop = 4.0
 pidControl = ['pid1', 'pid2']
 Kp = 60
 Kd = -150
 Ki = 80
 if Ki == 0:
-    iMax = cMax-2
+    iMax = [cMax[0]-2, cMax[1]-2]
 else:
-    iMax = (cMax-2)/Ki
+    iMax = [(cMax[0]-2)/Ki, (cMax[1]-2)/Ki]
 iMin = -1000
-pidControl[0] = PID(Kp, Ki, Kd, 0, 0, iMax, iMin)
-pidControl[1] = PID(Kp, Ki, Kd, 0, 0, iMax, iMin)
+pidControl[0] = PID(Kp, Ki, Kd, 0, 0, iMax[0], iMin)
+pidControl[1] = PID(Kp, Ki, Kd, 0, 0, iMax[1], iMin)
 #~ cvStart=4.15
 volGoal = [4.2, 4.2]
 #~ slop=(cStop-cMax)/(volGoal-cvStart)
@@ -84,8 +84,26 @@ def set_charge_current(ii):
     #~ reply = get_data(chargerSocket[ii], ii+4)
     #~ print reply
     top_cell = max(chargeVol[2*ii], chargeVol[2*ii+1])
+    #change max current, max integrator wind up based on min voltage with a deadband for switching
+    bot_cell = min(minVol[2*ii], minVol[2*ii+1])
+    if bot_cell < 3:
+        cMax[ii] = 22.25 #calculate new cMax capacity/10
+        if Ki == 0:
+            iMax[ii] = cMax[ii]-2
+        else:
+            iMax[ii] = (cMax[ii]-2)/Ki
+        setIntegrator_max(pidControl[ii],iMax)
+    elif bot_cell > 3.1: #deadband to prevent current chattering
+        cMax[ii] = 44.5 #calculate new cMax capacity/10
+        if Ki == 0:
+            iMax[ii] = cMax[ii]-2
+        else:
+            iMax[ii] = (cMax[ii]-2)/Ki
+        setIntegrator_max(pidControl[ii],iMax[ii])
+    #calculate charging current
     cur = 2+pidControl[ii].update(top_cell)
-    cur = round(max(min(cur, cMax), 0), 2)
+    #saturate command with upper and lower bounds
+    cur = round(max(min(cur, cMax[ii]), 0), 2)
     send_command(chargerSocket[ii], "sour:curr " + str(cur))
     #~ if len(reply) < 2:
         #~ communicationFlags[ii+4] = 0

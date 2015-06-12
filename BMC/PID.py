@@ -57,8 +57,8 @@ class PID:
 		Initilize the setpoint of PID
 		"""
 		self.set_point = set_point
-		self.Integrator=0
-		self.Derivator=0
+		self.Integrator = 0
+		self.Derivator = 0
 
 	def setIntegrator(self, Integrator):
 		self.Integrator = Integrator
@@ -67,13 +67,13 @@ class PID:
 		self.Derivator = Derivator
 
 	def setKp(self,P):
-		self.Kp=P
+		self.Kp = P
 
 	def setKi(self,I):
-		self.Ki=I
+		self.Ki = I
 
 	def setKd(self,D):
-		self.Kd=D
+		self.Kd = D
 
 	def getPoint(self):
 		return self.set_point
@@ -83,6 +83,9 @@ class PID:
 
 	def getIntegrator(self):
 		return self.Integrator
+
+    def setIntegrator_max(self,Integrator_max):
+        self.Integrator_max = Integrator_max
 
 	def getDerivator(self):
 		return self.Derivator
