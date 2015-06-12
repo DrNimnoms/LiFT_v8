@@ -21,7 +21,7 @@
  *----------------------------------------------------------------------------*/
  void BMEcheck(){
    
-   for(int i=0;i<BMENum;i++){
+   for(int i = 0; i<BMENum; i++){
      if(BME[i].dataCheck){
        Serial.print("ERROR Communicating with BME ");
        Serial.println((i+1));
@@ -40,7 +40,7 @@
  *----------------------------------------------------------------------------*/
  void printOut(){
    
-   for(int i=0;i<BMENum;i++){
+   for(int i = 0; i < BMENum; i++){
      if(BME[i].dataCheck){
        Serial.print("ERROR Communicating with BME ");
        Serial.println((i+1));

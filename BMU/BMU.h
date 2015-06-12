@@ -69,15 +69,15 @@
   #define ONESECOND 1000000   // in microseconds
 
 // debugging variables
-  boolean uartPrint= false;    // print for debugging
-  String inputString="";
-  boolean fakeVolFlag=false;
-  boolean fakePressFlag=false;
-  boolean fakeTempFlag=false;
-  boolean fakeTotVolFlag=false;
-  boolean fakeModVolFlag=false;
-  boolean fakeCurFlag=false;
-  boolean pseudoDataFlag = false;
+  boolean uartPrint = false;    // print for debugging
+  String inputString = "";
+  boolean fakeVolFlag = false;
+  boolean fakePressFlag = false;
+  boolean fakeTempFlag = false;
+  boolean fakeTotVolFlag = false;
+  boolean fakeModVolFlag = false;
+  boolean fakeCurFlag = false;
+  boolean pseudoDataFlag = true;
   
   enum mode { STOPMODE, DRIVEMODE, CHARGEMODE,BALANCEMODE};
   
@@ -176,14 +176,14 @@ typedef struct  {
   int vol[cellNum];      // array of virtual cell voltages
   int vSum;              //measured  BME voltage
   int vref2;              
-  int temp[4];           // temperature of: 0-2 = virtual cells, 3 =heatsink
+  int temp[4];           // temperature of: 0-2 = virtual cells, 3 = heatsink
   int iTemp;              // internal temperature of BME LTC84 chip
   float modSum;            //calculated BME voltage (sum of layers)
   float fVol[cellNum];    //float versions of everything
-  float fVSum;
-  float fVref2; 
-  float fTemp[4];
-  float fiTemp;
+  float fVSum;            // float version of vSum
+  float fVref2;           // float version of Vref2
+  float fTemp[4];         // float version of Temp
+  float fiTemp;           // float version of iTemp
   boolean ignoreT[4];
   boolean ignoreiT;
   boolean uFlag[cellNum];

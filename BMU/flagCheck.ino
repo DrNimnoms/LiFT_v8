@@ -5,7 +5,7 @@
 void checkFlags(void){
   leakCheck();      //checks the front and back leak sensors
   bmeCommCheck();   //checks the communication of all BME's
-  if(modeInfo.currentMode!=BALANCEMODE){
+  if(modeInfo.currentMode != BALANCEMODE){
     fanOn = false;
     volCheck();      //checks the voltage for over and under voltage
     bmeFlagCheck();  //checks the BME's self-checks flags
@@ -26,34 +26,34 @@ void checkFlags(void){
  * checks to the if there is a leak in front or back of the half-string
  *-----------------------------------------------------------------------------*/
  void leakCheck(){
-  static int fwLeakCounter=0;
-  static int bwLeakCounter=0;
-  leakFlag=false;
+  static int fwLeakCounter = 0;
+  static int bwLeakCounter = 0;
+  leakFlag = false;
   if(fwLeak) fwLeakCounter++;
-  else fwLeakCounter=0;
+  else fwLeakCounter = 0;
   if(bwLeak) bwLeakCounter++;
-  else bwLeakCounter=0;
-  if((bwLeakCounter > 1) || (fwLeakCounter>1)) leakFlag=true;  //checks the leak sensors
+  else bwLeakCounter = 0;
+  if((bwLeakCounter > 1) || (fwLeakCounter > 1)) leakFlag = true;  //checks the leak sensors
  }
 /*------------------------------------------------------------------------------
  * void timeoutCheck()
  * time out after 10 hours of chargeing or balancing
  *----------------------------------------------------------------------------*/
  void timeoutCheck(){
-   unsigned long timeSince= timeElapsed(modeInfo.timeKeepingStamp);  // update time in the mode
-   modeInfo.timeKeepingStamp=micros();
-   modeInfo.microseconds+=timeSince;   
-   if (modeInfo.microseconds>ONEMINUTE){
-       modeInfo.microseconds-=ONEMINUTE;
+   unsigned long timeSince = timeElapsed(modeInfo.timeKeepingStamp);  // update time in the mode
+   modeInfo.timeKeepingStamp = micros();
+   modeInfo.microseconds += timeSince;   
+   if (modeInfo.microseconds > ONEMINUTE){
+       modeInfo.microseconds -= ONEMINUTE;
        modeInfo.minutes++;
    }
-   if (modeInfo.minutes>60){
-       modeInfo.minutes-=60;
+   if (modeInfo.minutes > 60){
+       modeInfo.minutes -= 60;
        modeInfo.hours++;
    }
-   timeoutFlag=false;      // Check if charging or balance time > 8 hours
-   if(modeInfo.currentMode==CHARGEMODE || modeInfo.currentMode==BALANCEMODE){
-     if (modeInfo.hours>=8) timeoutFlag= true;  // set Timeout flag
+   timeoutFlag = false;      // Check if charging or balance time > 8 hours
+   if(modeInfo.currentMode == CHARGEMODE || modeInfo.currentMode == BALANCEMODE){
+     if (modeInfo.hours >= 8) timeoutFlag = true;  // set Timeout flag
    }
 //   if(uartPrint)Serial.print("Mode(");
 //   if(uartPrint)Serial.print(modeInfo.currentMode);
@@ -71,13 +71,13 @@ void checkFlags(void){
  * checks the current sensor reading
  *----------------------------------------------------------------------------*/
  void currentCheck(){
-   driveCurflag=false;          //Current >2A durring Drive
-   chargeCurFlag=false;      //Current > 92A or current <2A during Charge
-   stopCurFlag=false;     //abs(Current)>1A
+   driveCurflag = false;          //Current >2A durring Drive
+   chargeCurFlag = false;      //Current > 92A or current <2A during Charge
+   stopCurFlag = false;     //abs(Current)>1A
 
-   if(modeInfo.currentMode==DRIVEMODE && current >= inCurLimit) driveCurflag= true;
-   if(modeInfo.currentMode==CHARGEMODE && (current >= highInCur || current <= highOutCur)) chargeCurFlag= true;
-   if((modeInfo.currentMode==STOPMODE || modeInfo.currentMode==BALANCEMODE) && abs(current) >= inOutCur) stopCurFlag= true;
+   if(modeInfo.currentMode == DRIVEMODE && current >= inCurLimit) driveCurflag = true;
+   if(modeInfo.currentMode == CHARGEMODE && (current >= highInCur || current <= highOutCur)) chargeCurFlag = true;
+   if((modeInfo.currentMode == STOPMODE || modeInfo.currentMode == BALANCEMODE) && abs(current) >= inOutCur) stopCurFlag = true;
  }
 
 /*------------------------------------------------------------------------------
@@ -85,10 +85,10 @@ void checkFlags(void){
  * checks the pressure sensor and the calculated pressure rate
  *----------------------------------------------------------------------------*/
  void pressurCheck(){
-   presRateFlag= false;    //Pressure rate > .25 PSI/sec
-   presFlag =false;      // Pressure < 0.5 PSI or Pressure  > 5.0 PSI
-   if(abs(presRate)>=presRateHigh) presRateFlag= true;
-   if((pressure>=presHighLimit) || (pressure<=presLowLimit)) presFlag= true;
+   presRateFlag = false;    //Pressure rate > .25 PSI/sec
+   presFlag = false;      // Pressure < 0.5 PSI or Pressure  > 5.0 PSI
+   if(abs(presRate)>=presRateHigh) presRateFlag = true;
+   if((pressure>=presHighLimit) || (pressure<=presLowLimit)) presFlag = true;
  }
 
 /*------------------------------------------------------------------------------
@@ -96,14 +96,14 @@ void checkFlags(void){
  * checks the communication of all BME's
  *----------------------------------------------------------------------------*/
  void bmeCommCheck(void){
-   static int dataCheckCounter[BMENum]={0};
-   bmeComFlag=false;  // Communication failure occurs between BMU and BME
+   static int dataCheckCounter[BMENum] = {0};
+   bmeComFlag = false;  // Communication failure occurs between BMU and BME
    
-   for(int j=0;j<BMENum;j++){                         // goes through all BMEs
+   for(int j = 0; j < BMENum; j++){                         // goes through all BMEs
      if(BME[j].dataCheck) dataCheckCounter[j]++;
-     else dataCheckCounter[j]=0;
-     if(dataCheckCounter[j]>1){
-       bmeComFlag=true;          // set communication error flag
+     else dataCheckCounter[j] = 0;
+     if(dataCheckCounter[j] > 1){
+       bmeComFlag = true;          // set communication error flag
        if(uartPrint)Serial.print("dataCheck error on bME ");
        if(uartPrint)Serial.println(j);
      }
@@ -115,13 +115,13 @@ void checkFlags(void){
  * checks the BME's self-checks flags
  *----------------------------------------------------------------------------*/
  void bmeFlagCheck(void){
-   bmeAlarmFlag=false; // If any cell over/under voltage failures or self-check failures are sent from BME 
+   bmeAlarmFlag = false; // If any cell over/under voltage failures or self-check failures are sent from BME 
    
-   for(int j=0;j<BMENum;j++){                         // goes through all BMEs
+   for(int j = 0; j < BMENum; j++){                         // goes through all BMEs
      if(!BME[j].dataCheck){                           // check if BME is communicating
-       for (int i=0;i<cellNum;i++){                   // goes through all virtual cells in a BME
+       for (int i = 0; i < cellNum; i++){                   // goes through all virtual cells in a BME
          if(BME[j].uFlag[i] || BME[j].oFlag[i]){
-           bmeAlarmFlag=true;
+           bmeAlarmFlag = true;
            if(uartPrint)Serial.print("BME ");
            if(uartPrint)Serial.print(j+1);
            if(uartPrint)Serial.print(" layer ");
@@ -131,7 +131,7 @@ void checkFlags(void){
        }
      }  
    }
-   if(selfTestFlag) bmeAlarmFlag=true;   
+   if(selfTestFlag) bmeAlarmFlag = true;   
  }
 
 /*------------------------------------------------------------------------------
@@ -141,61 +141,61 @@ void checkFlags(void){
  *----------------------------------------------------------------------------*/
 void tempCheck(void){
  // set flags to false before starting the temperature check
- tempAlarmFlag=false;
- tempWarnFlag=false;
- tempFailFlag=false;
+ tempAlarmFlag = false;
+ tempWarnFlag = false;
+ tempFailFlag = false;
  
  //
- for(int j=0;j<BMENum;j++){                         // goes through all BMEs
+ for(int j = 0; j<BMENum; j++){                         // goes through all BMEs
    if(!BME[j].dataCheck){                           // check if BME is communicating
-     for (int i=0;i<cellNum;i++){                   // goes through all virtual cells in a BME
+     for (int i= 0;i<cellNum;i++){                   // goes through all virtual cells in a BME
        if(!BME[j].ignoreT[i]){
-         if(BME[j].fTemp[i] <-2 || BME[j].fTemp[i]== 'nan'){  //check and set temperature sensor failure flag
-           if(flagIgnoreTemp) BME[j].ignoreT[i]=true;
-           else tempFailFlag= true;
+         if(BME[j].fTemp[i] <-2 || BME[j].fTemp[i] == 'nan'){  //check and set temperature sensor failure flag
+           if(flagIgnoreTemp) BME[j].ignoreT[i] = true;
+           else tempFailFlag = true;
          }
          else if(BME[j].fTemp[i] >= tempVCWarn){           // check virtual cell temperature for temperature warning
            if(BME[j].fTemp[i] >= tempVCAlarm){        // check virtual cell temperature for temperature error
-             if(flagIgnoreTemp) BME[j].ignoreT[i]=true;
-             else tempAlarmFlag=true;                          // set temperature alarm flag
+             if(flagIgnoreTemp) BME[j].ignoreT[i] = true;
+             else tempAlarmFlag = true;                          // set temperature alarm flag
            }
            else {
-             if(flagIgnoreTemp) BME[j].ignoreT[i]=true;
-             else tempWarnFlag=true;                             // set temperature warnning flag
+             if(flagIgnoreTemp) BME[j].ignoreT[i] = true;
+             else tempWarnFlag = true;                             // set temperature warnning flag
            }
          }
        }
      }
      if(!BME[j].ignoreT[3]){
-       if( BME[j].fTemp[3] <-2 || BME[j].fTemp[3]== 'nan' ){ //check and set temperature sensor failure flag
-         if(flagIgnoreTemp) BME[j].ignoreT[3]=true;
-         else tempFailFlag= true; 
+       if( BME[j].fTemp[3] <-2 || BME[j].fTemp[3] == 'nan' ){ //check and set temperature sensor failure flag
+         if(flagIgnoreTemp) BME[j].ignoreT[3] = true;
+         else tempFailFlag = true; 
        } 
        else if( BME[j].fTemp[3] >= tempHSWarn){        // check heat sink and chip temperature for temperature warning
          if(BME[j].fTemp[3] >= tempHSAlarm){    // check heat sink and chip temperature for temperature warning
-             if(flagIgnoreTemp) BME[j].ignoreT[3]=true;
-             else tempAlarmFlag=true;                          // set temperature alarm flag
+             if(flagIgnoreTemp) BME[j].ignoreT[3] = true;
+             else tempAlarmFlag = true;                          // set temperature alarm flag
          }
          else{
-           if(flagIgnoreTemp) BME[j].ignoreT[3]=true;
-           else tempWarnFlag=true;                             // set temperature warnning flag
+           if(flagIgnoreTemp) BME[j].ignoreT[3] = true;
+           else tempWarnFlag = true;                             // set temperature warnning flag
          }
        }
      }
      if(!BME[j].ignoreiT){
        if(BME[j].fiTemp >= tempTiWarn){
          if(BME[j].fiTemp >= tempTiAlarm){
-            if(flagIgnoreTemp) BME[j].ignoreiT=true;
-             else tempAlarmFlag=true;                          // set temperature alarm flag
+            if(flagIgnoreTemp) BME[j].ignoreiT = true;
+             else tempAlarmFlag = true;                          // set temperature alarm flag
          }
          else{
-           tempWarnFlag=true;                             // set temperature warnning flag
+           tempWarnFlag = true;                             // set temperature warnning flag
          }
        }
      }
    }
  } 
- flagIgnoreTemp=false;
+ flagIgnoreTemp = false;
 }
 
 /*------------------------------------------------------------------------------
@@ -205,24 +205,24 @@ void tempCheck(void){
  *----------------------------------------------------------------------------*/
 void volCheck(void){
   // set flags to false before starting the voltage check
-  volHighAlarmFlag =false;      //Any VC voltage > 4.205 V 
-  balRecFlag=false;             //Any VC voltage < 3.9 V
-  volLowWarnFlag =false;     //Any VC voltage < 3.2 V
+  volHighAlarmFlag = false;      //Any VC voltage > 4.205 V 
+  balRecFlag = false;             //Any VC voltage < 3.9 V
+  volLowWarnFlag = false;     //Any VC voltage < 3.2 V
   volLowBalAlarmFlag = false;
-  volLowAlarmFlag =false;    //Any VC voltage < 3.0 V
-  deadBatAlarmFlag=false;    //Any VC voltage < 2.5 V
-  volFailFlag =false;      //Any VC voltage < .1 V or >6.5 or Vref2<2.978 or>3.020
-  boolean misTempo=false;
-  volMisFlag =false;      /*5V difference between overall half-string voltage and sum of half-string VC voltages or
+  volLowAlarmFlag = false;    //Any VC voltage < 3.0 V
+  deadBatAlarmFlag = false;    //Any VC voltage < 2.5 V
+  volFailFlag = false;      //Any VC voltage < .1 V or >6.5 or Vref2<2.978 or>3.020
+  boolean misTempo = false;
+  volMisFlag = false;      /*5V difference between overall half-string voltage and sum of half-string VC voltages or
                                      50mV difference between battery module voltage and sum of its VC voltages*/
                                      
-  for(int j=0;j<BMENum;j++){                // goes through all BMEs
+  for(int j = 0; j < BMENum; j++){                // goes through all BMEs
    if(!BME[j].dataCheck){                   // check if BME is communicating
      if ( (BME[j].fVref2 > 3.020) || (BME[j].fVref2 < 2.978)){
        volFailFlag = true;             // set voltage failure flag
      } 
-     if(abs(BME[j].modSum-BME[j].fVSum)>=volModMismatch){
-       misTempo =true;
+     if(abs(BME[j].modSum-BME[j].fVSum) >= volModMismatch){
+       misTempo = true;
        Serial.print("BME ");
        Serial.print(j+1);
        Serial.print(": modSum ");
@@ -234,7 +234,7 @@ void volCheck(void){
 
    }
   }
-  if(abs(totalVoltage-volSum)>=volMismatch){
+  if(abs(totalVoltage-volSum) >= volMismatch){
     misTempo = true;
     if(uartPrint)Serial.print("MISMATCH! totalVoltage:");
     if(uartPrint)Serial.print(totalVoltage);
@@ -245,24 +245,24 @@ void volCheck(void){
   if(maxVol >= 6.5 ){     // check virtual cell voltage sensor for failure 
        volFailFlag = true;             // set voltage failure flag
   } 
-  else if((maxVol >= volHighAlarm) || (modeInfo.currentMode==CHARGEMODE && maxVol>=(charge2Vol+0.01))){  // check virtual cell voltage for high voltage flag
+  else if((maxVol >= volHighAlarm) || (modeInfo.currentMode==CHARGEMODE && maxVol >= (charge2Vol+0.01))){  // check virtual cell voltage for high voltage flag
     volHighAlarmFlag  = true;          // set high voltage error flag
     if(uartPrint) Serial.print("high voltage alarm: ");
     if(uartPrint) Serial.println(maxVol,4);
   }  
   
   if(minVol <= 0.0) volFailFlag = true;             // set voltage failure flag
-  else if(minVol <= deadBatAlarm && modeInfo.currentMode!=DRIVEMODE){
-    deadBatAlarmFlag=true;  // set dead battery alarm
+  else if(minVol <= deadBatAlarm && modeInfo.currentMode != DRIVEMODE){
+    deadBatAlarmFlag = true;  // set dead battery alarm
     if(uartPrint) Serial.print("dead battery alarm: ");
     if(uartPrint) Serial.println(minVol,4);
   }
-  else if(minVol <= volLowAlarm && modeInfo.currentMode!=CHARGEMODE){
-    volLowAlarmFlag=true;    // low voltage alarm
+  else if(minVol <= volLowAlarm && modeInfo.currentMode != CHARGEMODE){
+    volLowAlarmFlag = true;    // low voltage alarm
     if(uartPrint) Serial.print("low voltage alarm: ");
     if(uartPrint) Serial.println(minVol,4);
   }
-  else if(minVol <= volLowWarn  && modeInfo.currentMode!=CHARGEMODE){
+  else if(minVol <= volLowWarn  && modeInfo.currentMode != CHARGEMODE){
     volLowWarnFlag = true;    //  low voltage warning  
     if(uartPrint) Serial.print("low battery warning: ");
     if(uartPrint) Serial.println(minVol,4);
@@ -272,13 +272,13 @@ void volCheck(void){
     if(uartPrint) Serial.print("low balancing alarm: ");
     if(uartPrint) Serial.println(minVol,4);
   }
-  if((maxVol-minVol)>=balRecVol && modeInfo.currentMode!=BALANCEMODE && minVol>=balRecLimit ){
-    balRecFlag=true;    // set balance recomanded flag
+  if((maxVol-minVol) >= balRecVol && modeInfo.currentMode != BALANCEMODE && minVol>=balRecLimit ){
+    balRecFlag = true;    // set balance recomanded flag
   }   
   
   if(misTempo) mismatchCount++;
-  else mismatchCount=0;
-  if(mismatchCount>1) volMisFlag =true;
+  else mismatchCount = 0;
+  if(mismatchCount>1) volMisFlag = true;
 }
 
 /*------------------------------------------------------------------------------
@@ -310,7 +310,7 @@ void volCheck(void){
    if(balDoneFlag) flagBMU=flagBMU | (1<<21);
    if(balRecFlag) flagBMU=flagBMU | (1<<22); 
    
-   flagBMU= flagBMU & ~flagOverride;
+   flagBMU = flagBMU & ~flagOverride;
  }
  
  /*------------------------------------------------------------------------------
@@ -318,30 +318,28 @@ void volCheck(void){
  * Sets the flag
  *----------------------------------------------------------------------------*/
  void setPriority(void){
-   
-   flagPriority=0;
-   
-   if(modeInfo.currentMode==DRIVEMODE){
-     if((flagBMU & 0x400000) !=0) flagPriority=5;   //  B10000000000000000000000
-     if((flagBMU & 0x00110A) !=0) flagPriority=4;  //  
-     if((flagBMU & 0x008000) !=0) flagPriority=3;
-     if((flagBMU & 0x016A75) !=0) flagPriority=2;    
+   flagPriority = 0; 
+   if(modeInfo.currentMode == DRIVEMODE){
+     if((flagBMU & 0x400000) != 0) flagPriority = 5;   //  B10000000000000000000000
+     if((flagBMU & 0x00110A) != 0) flagPriority = 4;  //  
+     if((flagBMU & 0x008000) != 0) flagPriority = 3;
+     if((flagBMU & 0x016A75) != 0) flagPriority = 2;    
    }
-   else if(modeInfo.currentMode==STOPMODE){
-     if((flagBMU & 0x400000) !=0) flagPriority=5;   //  B10000000000000000000000
-     if((flagBMU & 0x00192A) !=0) flagPriority=4;  //  
-     if((flagBMU & 0x04E655) !=0) flagPriority=3;  // 
+   else if(modeInfo.currentMode == STOPMODE){
+     if((flagBMU & 0x400000) != 0) flagPriority = 5;   //  B10000000000000000000000
+     if((flagBMU & 0x00192A) != 0) flagPriority = 4;  //  
+     if((flagBMU & 0x04E655) != 0) flagPriority = 3;  // 
    }  
    else if(modeInfo.currentMode==BALANCEMODE){
-     if((flagBMU & 0x200000) !=0) flagPriority=6;   //  B10100000000000000000000
-     if((flagBMU & 0x00102A) !=0) flagPriority=2;  //  B00000000000000000101010
-     if((flagBMU & 0x0CE8D5) !=0) flagPriority=1;  //  
+     if((flagBMU & 0x200000) != 0) flagPriority = 6;   //  B10100000000000000000000
+     if((flagBMU & 0x00102A) != 0) flagPriority = 2;  //  B00000000000000000101010
+     if((flagBMU & 0x0CE8D5) != 0) flagPriority = 1;  //  
    }
-   else if(modeInfo.currentMode==CHARGEMODE){
-     if((flagBMU & 0x100000) !=0) flagPriority=6;
-     if((flagBMU & 0x400000) !=0) flagPriority=5;   //  B01000000000000000000000
-     if((flagBMU & 0x00002A) !=0) flagPriority=2;   // 
-     if((flagBMU & 0x0AFC55) !=0) flagPriority=1;  //  
+   else if(modeInfo.currentMode == CHARGEMODE){
+     if((flagBMU & 0x100000) != 0) flagPriority = 6;
+     if((flagBMU & 0x400000) != 0) flagPriority = 5;   //  B01000000000000000000000
+     if((flagBMU & 0x00002A) != 0) flagPriority = 2;   // 
+     if((flagBMU & 0x0AFC55) != 0) flagPriority = 1;  //  
    }  
  }
  

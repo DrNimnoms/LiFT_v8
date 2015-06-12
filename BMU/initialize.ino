@@ -43,7 +43,7 @@ void pinInital(void){
   }
   initalizeSoc();
   //************************ BMU setup *************************// 
-  modeInfo.currentMode=STOPMODE;
+  modeInfo.currentMode = STOPMODE;
   modeReset();
   pinMode(relay1, OUTPUT); //pin selected to control
   digitalWrite(relay1, LOW);
@@ -63,7 +63,7 @@ void pinInital(void){
   else{
     getBMUData();    // gets/calculates data for the half string
   }
-  presOld=pressure;
+  presOld = pressure;
   intitBiquadFil();
   //************************ Ethernet setup *************************// 
   // start the Ethernet connection and the server:
@@ -79,7 +79,7 @@ void pinInital(void){
   BMUNum = !digitalRead(Add0);
   BMUNum |= !digitalRead(Add1)<<1;
   BMUNum |= !digitalRead(Add2)<<2;
-  ipadd[3]=170+BMUNum;
+  ipadd[3] = 170+BMUNum;
   port = 40+BMUNum;
   byte macTempo0[6] = { 0x90, 0xA2, 0xDA, 0x0E, 0xCE, 0x7B };
   byte macTempo1[6] = { 0x90, 0x2A, 0xDA, 0x0E, 0xCE, 0x78 };
@@ -92,9 +92,6 @@ void pinInital(void){
   if(BMUNum == 1) memcpy( mac, macTempo1, 6 );
   if(BMUNum == 2) memcpy( mac, macTempo2, 6 );
   if(BMUNum == 3) memcpy( mac, macTempo3, 6 );
-
-
-  
   
   IPAddress ip(ipadd);
   server = EthernetServer(port);
