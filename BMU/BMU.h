@@ -22,9 +22,9 @@
   #define volMismatch 3.0       //voltage mismatch limit between calculated and measured total voltage of half-string
   #define volModMismatch 0.06   //voltage mismatch limit between calculated and measured total voltage of battery module
  
-  #define presHighLimit 5.0    //High pressure limit
+  #define presHighLimit 2.5    //High pressure limit
   #define presLowLimit  0.5     //Low Pressure limit
-  #define presRateHigh 0.06    //High pressure rate limit
+  #define presRateHigh 0.15    //High pressure rate limit
   
   #define inCurLimit 2.0      //current in limit durring Drive
   #define highInCur 92.0      //high current in limit during Charging 
@@ -41,8 +41,10 @@
 //BMU ADC conversion constants
   #define curConst 0.08587        //80/V*3.3V/4095*4.01ohm/3.01ohm  sensor resolution*adc resolution*voltage divider
   #define volConst 0.0482  //.0439    //(174Kohm+10Kohm)/10Kohm*(10kohm+5.1kohm)/5.1kohm*3.3V/4095
-  #define presConst 0.0019073   //1 kpa/5V/0.018*4.7ohm/3.2ohm*3.3V/4095*0.14503 gpsi/kpa
-  #define presOffset 0.3223     //0.04 kpa 0.14503 gpsi/kpa
+//  #define presConst 0.0019073   //1 kpa/5V/0.018*4.7ohm/3.2ohm*3.3V/4095*0.14503 gpsi/kpa  
+  #define presConst 0.004387    ///1 kpa/5V/0.007826*4.7ohm/3.2ohm*3.3V/4095*0.14503 gpsi/kpa  ==> 0.00438711564
+//  #define presOffset 0.3223     //0.04 kpa 0.14503 gpsi/kpa 
+  #define presOffset 13.3200473     // 0.07739 kpa ==> 0.0112244705 PSI ==>14.7035473 GPSI
   #define capConst 0.0000555556    //0.2 sec==>.000055556 hours
 
 // BMU battery prameters
@@ -60,6 +62,7 @@
   
   //time
   #define ONEHOUR 36000000000 //in microseconds
+  #define SEVENMINUTES 420000000  // in microseconds
   #define TWOMINUTES 120000000  // in microseconds
   #define ONEMINUTE 60000000  // in microseconds
   #define THIRTYSECONDS 30000000 //in microseconds
@@ -77,7 +80,7 @@
   boolean fakeTotVolFlag = false;
   boolean fakeModVolFlag = false;
   boolean fakeCurFlag = false;
-  boolean pseudoDataFlag = true;
+  boolean pseudoDataFlag = false;
   
   enum mode { STOPMODE, DRIVEMODE, CHARGEMODE,BALANCEMODE};
   
@@ -114,6 +117,7 @@
  unsigned long timeStamp = 0;          // used to keep track of the loop time
  unsigned long balanceTimeStamp = 0;  // keeps track of balancing timing
  unsigned long bmcComTimeStamp = 0;   // keeps track of time since last communication
+ unsigned long reconTimeStamp = 0;
  const long balanceRelaxTime = TWOMINUTES; // length of time balance mode must wait before discharging 
  const long balanceCheckTime = THIRTYSECONDS; // 
  long dLoopTime = 0;         //actual loop time in usec
@@ -138,8 +142,11 @@ boolean contactorsOn = false;
 float totalVoltage = 0;        // total half-string voltage read from ADC
 float tVolOld = 0;          // the last total voltage
 float pressure = 0;        // pressure sensor reading
+float pressureArray[5]={0};
+int presCount=0;
 float presOld = 0;              // last pressure value
 float presRate = 0;          // filtered pressure rate
+float maxPresRate = 0;          // filtered pressure rate
 int current0 = 0;         // current mid point
 float current = 0;        // value read from the LEM sensor
 float currentOffset = 0;  // current offset

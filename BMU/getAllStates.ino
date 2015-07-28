@@ -29,7 +29,13 @@
   if(fakeTotVolFlag) totalVoltage = fakeStuff.totalVoltage;  //
   presOld = pressure;
   pressure = avgADC(presIn1Pin,3)*presConst-presOffset;    //get pressure
+  presCount++;
+  presCount=presCount%5;
+  pressureArray[presCount]=pressure;
   
+//  Serial.print("pressure = ");
+//  Serial.print(pressure,4);
+//  Serial.print(",");
   if (fakePressFlag) fakePressureData();
   current0 = avgADC(cur0InPin,3);//analogRead(cur0InPin);
   curMeas = (avgADC(curInPin,3)-(float)current0)*curConst;
@@ -48,7 +54,13 @@
  void calStateBMU(void){
   
   socCal();                              //calculates the state of charge
-  presRate = biquadFilter(biPresrate, (pressure-presOld)*dtRecip);                // filtered pressure rate
+//  presRate = (pressure-presOld)*dtRecip;        //unfiltered pressure
+  int lastSecPres= (presCount+1)%5;
+  presRate = pressureArray[presCount] - pressureArray[lastSecPres];
+//  Serial.print("prate = ");
+//  Serial.println(presRate,4);
+  if(abs(presRate)>abs(maxPresRate)) maxPresRate = presRate;
+//  presRate = biquadFilter(biPresrate, (pressure-presOld)*dtRecip);                // filtered pressure rate
 //  presRate=rateCal(pressure,presOld);    // calculates pressure rate
 //  presOld=pressure;                      //set the old pressure value to the new one
  }

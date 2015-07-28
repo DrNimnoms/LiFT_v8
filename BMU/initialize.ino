@@ -4,7 +4,6 @@
  *----------------------------------------------------------------------------*/
 
 void pinInital(void){
-  int i=0;
   
   Serial.begin(9600);           // set up Serial library at 9600 bps 
   
@@ -26,7 +25,7 @@ void pinInital(void){
   intit_PEC15_table(); //make PEC table
   LTC_initial();
   delay(2);
-  for(i=0;i<BMENum;i++){
+  for(int i=0;i<BMENum;i++){
     BME[i].addr=0x80+(i<<3);
     BME[i].DCC=0;
     BME[i].GPIO=0;
@@ -62,6 +61,7 @@ void pinInital(void){
   }
   else{
     getBMUData();    // gets/calculates data for the half string
+    for(int i=0;i<5;i++) pressureArray[i]=pressure;
   }
   presOld = pressure;
   intitBiquadFil();
@@ -85,8 +85,8 @@ void pinInital(void){
   byte macTempo1[6] = { 0x90, 0x2A, 0xDA, 0x0E, 0xCE, 0x78 };
   byte macTempo2[6] = { 0x90, 0x2A, 0xDA, 0x0E, 0xCD, 0x9F };
   byte macTempo3[6] = { 0x90, 0x2A, 0xDA, 0x0E, 0xCD, 0x96 };
-//  if(uartPrint) Serial.println(BMUNum);
-//  if(uartPrint) Serial.println(ipadd[3]);
+//  Serial.println(BMUNum);
+//  Serial.println(ipadd[3]);
   
   if(BMUNum == 0) memcpy( mac, macTempo0, 6 );
   if(BMUNum == 1) memcpy( mac, macTempo1, 6 );

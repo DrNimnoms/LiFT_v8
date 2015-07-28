@@ -9,8 +9,7 @@ void BMCcomm()
 {  
   //if(loopCount%bmcComTime==0){      //execute once a secloop areWeThereYet(BMCcommdt,960000)
   if(areWeThereYet(bmcComTimeStamp,TENSECONDS)) bmcComFlag = true; // too much time has elapsed since communcation
-                                                                  //set the bmc communication flag
-
+                                                                  //set the bmc communication flag                                                               
    // listen for incoming clients
     EthernetClient client = server.available();
     if (client) {
@@ -38,8 +37,20 @@ void BMCcomm()
         flagOverride = ~(~flagOverride | (0xE));
         flagIgnoreTemp = true;
       }
-      sendData((EthernetClient&) client);
+      sendData((EthernetClient&) client);   
     }
+//    Serial.println(timeElapsed(bmcComTimeStamp)/1000);
+    if(areWeThereYet(bmcComTimeStamp,THIRTYSECONDS) && areWeThereYet(reconTimeStamp,THIRTYSECONDS)){
+      reconTimeStamp = micros();
+      client.stop();
+      IPAddress ip(ipadd);
+      server = EthernetServer(port);
+      Ethernet.begin(mac, ip, gateway, subnet);
+      server.begin();
+      delay(5); // waits 5 us for configuration
+//      Serial.println("reconnect");
+    }
+    
 }
 
 
@@ -74,8 +85,8 @@ void sendData(EthernetClient& _Client){
   _Client.print(',');
   _Client.print(pressure,2);
   _Client.print(',');
-  _Client.print(presRate,2);
-  
+  _Client.print(maxPresRate,2);
+  maxPresRate=0;
 //  int testnum=36700+random(-85,85);
   
   for(j=0;j<BMENum;j++){
