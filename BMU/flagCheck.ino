@@ -33,7 +33,10 @@ void checkFlags(void){
   else fwLeakCounter = 0;
   if(bwLeak) bwLeakCounter++;
   else bwLeakCounter = 0;
-  if((bwLeakCounter > 1) || (fwLeakCounter > 1)) leakFlag = true;  //checks the leak sensors
+  if((bwLeakCounter > 75) || (fwLeakCounter > 75)) {
+    leakFlag = true;  //checks the leak sensors
+//    Serial.println("leak!");
+  }
  }
 /*------------------------------------------------------------------------------
  * void timeoutCheck()

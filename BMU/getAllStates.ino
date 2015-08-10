@@ -32,14 +32,16 @@
   presCount++;
   presCount=presCount%5;
   pressureArray[presCount]=pressure;
-  
 //  Serial.print("pressure = ");
-//  Serial.print(pressure,4);
+//  Serial.print(fwLeak);
 //  Serial.print(",");
+//  Serial.print(bwLeak);
+//  Serial.println(",");
   if (fakePressFlag) fakePressureData();
   current0 = avgADC(cur0InPin,3);//analogRead(cur0InPin);
   curMeas = (avgADC(curInPin,3)-(float)current0)*curConst;
   current = curMeas-currentOffset;
+//  current = (current+ (curMeas-currentOffset))/2;
   if(fakeCurFlag) current = fakeStuff.current;
 //  if (abs(current)<=.4) current=0;
 
