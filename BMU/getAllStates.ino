@@ -92,27 +92,25 @@
    realBalDataFlag = false;
  }
  
-if ((modeInfo.currentMode != BALANCEMODE) || realBalDataFlag){ 
   for(int i = 0; i < BMENum; i++){ 
-    RDCVA((BMEdata&) BME[i]); // get cell voltages of layers, vol[0], vol[1],vol[2] 
+    RDCVA((BMEdata&) BME[i]); // get cell voltages of layers, vol[0], vol[1],vol[2], ***does not update values all the time during balance***
   }
-}
 
-   
+
   // get cell temperatures
   ADAX(0,0);
   delayMicroseconds(BMEConDelay1);
   
   for(int i = 0; i < BMENum; i++){
     RDAUXA((BMEdata&) BME[i]); // get temp[0], temp[1], temp[3]
-    RDAUXB((BMEdata&) BME[i]);  // get temp[2], vref2
+    RDAUXB((BMEdata&) BME[i]);  // get temp[2], vref2   ***does not update values all the time during balance***
   }
   
   // get chip temperatures, sum of battery module 
   ADSTAT(0,0);
   delayMicroseconds(BMEConDelay2);
   for(int i = 0; i < BMENum; i++){
-    RDSTATA((BMEdata&) BME[i]);  //gets vSum and iTemp
+    RDSTATA((BMEdata&) BME[i]);  //gets vSum and iTemp  ***does not update values all the time during balance***
     RDSTATB((BMEdata&) BME[i]);  //uFlog oFlag
   }
 //  BME[8].DCC=6;

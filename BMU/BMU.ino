@@ -22,7 +22,7 @@ created 10/3/2013
   
   void loop() 
   {
-    timeStamp=micros();                // microseconds since board initialized, overflow/rollover after ~11.9 hours (2^32-1 uS)
+    timeStamp = micros();                // microseconds since board initialized, overflow/rollover after ~11.9 hours (2^32-1 uS)
                                        // returned in 1 microsecond resolution
     if(!modeInfo.selfCheck) BMESelfTest();
  
