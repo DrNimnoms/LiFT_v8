@@ -78,44 +78,70 @@
   for(i=0;i<BMENum;i++){ 
     BME[i].dataCheck = false;
   }
+
+  if(modeInfo.currentMode == BALANCEMODE){
+   realBalDataFlag = areWeThereYet(balanceTimeStamp,balanceCheckTime+6*controlTime);
+  }
+  else
+  {
+    realBalDataFlag = false;
+  }
   
-  CLRCELL(0);          // wake the bme 
-  
-  ADCV(0,0);          //  broadcast to all channels
-  delayMicroseconds(BMEConDelay1);
-  
- if(modeInfo.currentMode == BALANCEMODE){
+<<<<<<< Updated upstream
+  if(modeInfo.currentMode == BALANCEMODE){
    realBalDataFlag = areWeThereYet(balanceTimeStamp,balanceCheckTime+6*controlTime);
  }
  else
  {
    realBalDataFlag = false;
  }
+  
+  CLRCELL(0);          // wake the bme 
+=======
+  wakeup_sleep();          // wake the bme 
+>>>>>>> Stashed changes
+  
+  ADCV(0,0);          //  broadcast to all channels
+  delayMicroseconds(BMEConDelay1);
+  
  
-if ((modeInfo.currentMode != BALANCEMODE) || realBalDataFlag){ 
+<<<<<<< Updated upstream
   for(int i = 0; i < BMENum; i++){ 
-    RDCVA((BMEdata&) BME[i]); // get cell voltages of layers, vol[0], vol[1],vol[2] 
+    RDCVA((BMEdata&) BME[i]); // get cell voltages of layers, vol[0], vol[1],vol[2], ***does not update values all the time during balance***
   }
-}
+=======
+//if ((modeInfo.currentMode != BALANCEMODE) || realBalDataFlag || !balRelaxFlag){ 
+  wakeup_idle();
+  for(int i = 0; i < BMENum; i++){ 
+    RDCVA((BMEdata&) BME[i]); // get cell voltages of layers, vol[0], vol[1],vol[2] , ***does not update values all the time during balance***
+  }
+//}
+>>>>>>> Stashed changes
 
-   
+
   // get cell temperatures
   ADAX(0,0);
   delayMicroseconds(BMEConDelay1);
-  
+  wakeup_idle();
   for(int i = 0; i < BMENum; i++){
     RDAUXA((BMEdata&) BME[i]); // get temp[0], temp[1], temp[3]
-    RDAUXB((BMEdata&) BME[i]);  // get temp[2], vref2
+    RDAUXB((BMEdata&) BME[i]);  // get temp[2], vref2   ***does not update values all the time during balance***
   }
   
   // get chip temperatures, sum of battery module 
   ADSTAT(0,0);
   delayMicroseconds(BMEConDelay2);
+  wakeup_idle();
   for(int i = 0; i < BMENum; i++){
-    RDSTATA((BMEdata&) BME[i]);  //gets vSum and iTemp
+<<<<<<< Updated upstream
+    RDSTATA((BMEdata&) BME[i]);  //gets vSum and iTemp  ***does not update values all the time during balance***
+=======
+    RDSTATA((BMEdata&) BME[i]);  //gets vSum and iTemp   ***does not update values all the time during balance***
+>>>>>>> Stashed changes
     RDSTATB((BMEdata&) BME[i]);  //uFlog oFlag
   }
 //  BME[8].DCC=6;
+  wakeup_idle();
   for(i = 0; i < BMENum; i++){               // Cycles through BME's
     BME[i].GPIO = 0x0f|((!fanOn)<<4);          // Sets the GPIO to 0 or 1 for the multiplexer
     WRCFG((BMEdata&) BME[i]);          // Sends out the GPIO command

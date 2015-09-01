@@ -3,7 +3,6 @@
  * does the command that is sent from the GUI
  *----------------------------------------------------------------------------*/
 void checkMode(String input){
-  
   if(input.indexOf("sto") >=0)//checks for stop
   {
     stopMode();
@@ -271,7 +270,10 @@ void checkMode(String input){
    int i,j;
    boolean balOn=false;
    balanceTimeStamp=micros();
-   realBalDataFlag=true;
+<<<<<<< Updated upstream
+=======
+//   realBalDataFlag=true;
+>>>>>>> Stashed changes
    balTempControl();
    if(uartPrint) Serial.println("discharging:");
    for(j=0;j<BMENum;j++){
