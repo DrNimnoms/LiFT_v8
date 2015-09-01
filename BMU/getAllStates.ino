@@ -86,37 +86,19 @@
   {
     realBalDataFlag = false;
   }
-  
-<<<<<<< Updated upstream
-  if(modeInfo.currentMode == BALANCEMODE){
-   realBalDataFlag = areWeThereYet(balanceTimeStamp,balanceCheckTime+6*controlTime);
- }
- else
- {
-   realBalDataFlag = false;
- }
-  
-  CLRCELL(0);          // wake the bme 
-=======
+
   wakeup_sleep();          // wake the bme 
->>>>>>> Stashed changes
-  
+
   ADCV(0,0);          //  broadcast to all channels
   delayMicroseconds(BMEConDelay1);
   
  
-<<<<<<< Updated upstream
-  for(int i = 0; i < BMENum; i++){ 
-    RDCVA((BMEdata&) BME[i]); // get cell voltages of layers, vol[0], vol[1],vol[2], ***does not update values all the time during balance***
-  }
-=======
 //if ((modeInfo.currentMode != BALANCEMODE) || realBalDataFlag || !balRelaxFlag){ 
   wakeup_idle();
   for(int i = 0; i < BMENum; i++){ 
     RDCVA((BMEdata&) BME[i]); // get cell voltages of layers, vol[0], vol[1],vol[2] , ***does not update values all the time during balance***
   }
-//}
->>>>>>> Stashed changes
+
 
 
   // get cell temperatures
@@ -133,11 +115,7 @@
   delayMicroseconds(BMEConDelay2);
   wakeup_idle();
   for(int i = 0; i < BMENum; i++){
-<<<<<<< Updated upstream
     RDSTATA((BMEdata&) BME[i]);  //gets vSum and iTemp  ***does not update values all the time during balance***
-=======
-    RDSTATA((BMEdata&) BME[i]);  //gets vSum and iTemp   ***does not update values all the time during balance***
->>>>>>> Stashed changes
     RDSTATB((BMEdata&) BME[i]);  //uFlog oFlag
   }
 //  BME[8].DCC=6;

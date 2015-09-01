@@ -109,18 +109,13 @@ void RDCVA(BMEdata& _BME)
   if (((modeInfo.currentMode != BALANCEMODE) || realBalDataFlag) || !balRelaxFlag ){
     if(!readCheck){
       parseData((int*) tempRev, (byte*) dataIn,3); // parses the data in to the cell voltages 
-<<<<<<< Updated upstream
-      for(int i=0;i<3;i++) _BME.vol[2-i]=tempRev[i];
-    }
-    _BME.dataCheck=_BME.dataCheck | readCheck;
-=======
+
       if ((modeInfo.currentMode != BALANCEMODE) || realBalDataFlag  || !balRelaxFlag){ 
         for(int i=0;i<3;i++) _BME.vol[2-i]=tempRev[i];
       }
     }
-  _BME.dataCheck=_BME.dataCheck | readCheck;
->>>>>>> Stashed changes
   }
+  _BME.dataCheck=_BME.dataCheck | readCheck;
 }
 
 
@@ -161,13 +156,7 @@ void RDAUXB(BMEdata& _BME)
   readCheck = readData(&dataIn[0], 6);  // reads the data in
   if(!readCheck){
     _BME.temp[2] = (dataIn[1]<<8) | dataIn[0];
-<<<<<<< Updated upstream
-    if (((modeInfo.currentMode != BALANCEMODE) || realBalDataFlag) || !balRelaxFlag ){ 
-      _BME.vref2 = (dataIn[5]<<8) | dataIn[4];
-    }
-=======
     _BME.vref2 = (dataIn[5]<<8) | dataIn[4];
->>>>>>> Stashed changes
   }
   _BME.dataCheck = _BME.dataCheck | readCheck;
 }
@@ -185,12 +174,8 @@ void RDSTATA(BMEdata& _BME)
   sendData(&comm[0],2); // send the command read the voltage for cells 1-4
   readCheck = readData(&dataIn[0], 6);  // reads the data in
   if(!readCheck){
-<<<<<<< Updated upstream
-    if (((modeInfo.currentMode != BALANCEMODE) || realBalDataFlag) || !balRelaxFlag ){
-=======
     if ((modeInfo.currentMode != BALANCEMODE) || realBalDataFlag  || !balRelaxFlag){ 
->>>>>>> Stashed changes
-    _BME.vSum = (dataIn[1]<<8) | dataIn[0];
+      _BME.vSum = (dataIn[1]<<8) | dataIn[0];
     }
     _BME.iTemp = (dataIn[3]<<8) | dataIn[2];
   }
