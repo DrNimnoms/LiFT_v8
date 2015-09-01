@@ -270,6 +270,10 @@ void checkMode(String input){
    int i,j;
    boolean balOn=false;
    balanceTimeStamp=micros();
+<<<<<<< Updated upstream
+=======
+//   realBalDataFlag=true;
+>>>>>>> Stashed changes
    balTempControl();
    if(uartPrint) Serial.println("discharging:");
    for(j=0;j<BMENum;j++){

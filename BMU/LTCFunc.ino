@@ -109,9 +109,17 @@ void RDCVA(BMEdata& _BME)
   if (((modeInfo.currentMode != BALANCEMODE) || realBalDataFlag) || !balRelaxFlag ){
     if(!readCheck){
       parseData((int*) tempRev, (byte*) dataIn,3); // parses the data in to the cell voltages 
+<<<<<<< Updated upstream
       for(int i=0;i<3;i++) _BME.vol[2-i]=tempRev[i];
     }
     _BME.dataCheck=_BME.dataCheck | readCheck;
+=======
+      if ((modeInfo.currentMode != BALANCEMODE) || realBalDataFlag  || !balRelaxFlag){ 
+        for(int i=0;i<3;i++) _BME.vol[2-i]=tempRev[i];
+      }
+    }
+  _BME.dataCheck=_BME.dataCheck | readCheck;
+>>>>>>> Stashed changes
   }
 }
 
@@ -153,9 +161,13 @@ void RDAUXB(BMEdata& _BME)
   readCheck = readData(&dataIn[0], 6);  // reads the data in
   if(!readCheck){
     _BME.temp[2] = (dataIn[1]<<8) | dataIn[0];
+<<<<<<< Updated upstream
     if (((modeInfo.currentMode != BALANCEMODE) || realBalDataFlag) || !balRelaxFlag ){ 
       _BME.vref2 = (dataIn[5]<<8) | dataIn[4];
     }
+=======
+    _BME.vref2 = (dataIn[5]<<8) | dataIn[4];
+>>>>>>> Stashed changes
   }
   _BME.dataCheck = _BME.dataCheck | readCheck;
 }
@@ -173,7 +185,11 @@ void RDSTATA(BMEdata& _BME)
   sendData(&comm[0],2); // send the command read the voltage for cells 1-4
   readCheck = readData(&dataIn[0], 6);  // reads the data in
   if(!readCheck){
+<<<<<<< Updated upstream
     if (((modeInfo.currentMode != BALANCEMODE) || realBalDataFlag) || !balRelaxFlag ){
+=======
+    if ((modeInfo.currentMode != BALANCEMODE) || realBalDataFlag  || !balRelaxFlag){ 
+>>>>>>> Stashed changes
     _BME.vSum = (dataIn[1]<<8) | dataIn[0];
     }
     _BME.iTemp = (dataIn[3]<<8) | dataIn[2];
@@ -511,6 +527,33 @@ void sendData(byte *dataOut, byte n)
   byte PEC1=PEC>>8&0xff;
   SPI.transfer(chipSelectPin,PEC1,SPI_CONTINUE);
   SPI.transfer(chipSelectPin,PEC0,SPI_CONTINUE);
+}
+
+/*!****************************************************
+  \brief Wake isoSPI up from idle state
+ Generic wakeup commannd to wake isoSPI up out of idle
+ *****************************************************/
+void wakeup_idle()
+{
+  digitalWrite(csBME1, LOW);
+  digitalWrite(csBME2, LOW);
+  delayMicroseconds(10); //Guarantees the isoSPI will be in ready mode
+  digitalWrite(csBME1, HIGH);
+  digitalWrite(csBME2, HIGH);
+}
+
+/*!****************************************************
+  \brief Wake the LTC6804 from the sleep state
+  
+ Generic wakeup commannd to wake the LTC6804 from sleep
+ *****************************************************/
+void wakeup_sleep()
+{
+  digitalWrite(csBME1, LOW);
+  digitalWrite(csBME2, LOW);
+  delay(1); // Guarantees the LTC6804 will be in standby
+  digitalWrite(csBME1, HIGH);
+  digitalWrite(csBME2, HIGH);
 }
 
 /*------------------------------------------------------------------------------
